@@ -5,7 +5,7 @@ import cors from "cors";
 // import { clerkMiddleware } from "@clerk/express";
 
 import { ENV } from "./lib/env.js";
-// import { connectDB } from "./lib/db.js";
+import { connectDB } from "./lib/db.js";
 // import { inngest, functions } from "./lib/inngest.js";
 // import chatRoutes from "./routes/chatRoutes.js";
 // import sessionRoutes from "./routes/sessionRoute.js";
@@ -39,7 +39,7 @@ if (ENV.NODE_ENV === "production") {
 
 const startServer = async () => {
   try {
-    // await connectDB();
+    await connectDB();
     app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
   } catch (error) {
     console.error(" Error starting the server", error);
