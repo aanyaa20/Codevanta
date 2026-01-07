@@ -10,3 +10,10 @@
     cursor: pointer;
   }
 }
+
+/* Custom light theme color overrides */
+:root {
+  --gradient-from: #3b82f6; /* Blue */
+  --gradient-via: #6366f1; /* Indigo */
+  --gradient-to: #8b5cf6; /* Purple */
+}

@@ -12,30 +12,30 @@ import { SignInButton } from "@clerk/clerk-react";
 
 function HomePage() {
   return (
-    <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300">
+    <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50">
       {/* NAVBAR */}
-      <nav className="bg-base-100/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg">
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
           {/* LOGO */}
           <Link
             to={"/"}
             className="flex items-center gap-3 hover:scale-105 transition-transform duration-200"
           >
-            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 flex items-center justify-center shadow-md">
               <SparklesIcon className="size-6 text-white" />
             </div>
 
             <div className="flex flex-col">
-              <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
+              <span className="font-black text-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent font-mono tracking-wider">
                 CodeVanta
               </span>
-              <span className="text-xs text-base-content/60 font-medium -mt-1">Code Together</span>
+              <span className="text-xs text-gray-600 font-medium -mt-1">Code Together</span>
             </div>
           </Link>
 
           {/* AUTH BTN */}
           <SignInButton mode="modal">
-            <button className="group px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2">
+            <button className="group px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2">
               <span>Get Started</span>
               <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -54,14 +54,14 @@ function HomePage() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Prepare Smarter,
               </span>
               <br />
-              <span className="text-base-content">Succeed Together.</span>
+              <span className="text-gray-900">Succeed Together.</span>
             </h1>
 
-            <p className="text-xl text-base-content/70 leading-relaxed max-w-xl">
+            <p className="text-xl text-gray-700 leading-relaxed max-w-xl">
               The ultimate platform for collaborative coding interviews and pair programming.
               Connect face-to-face, code in real-time, and ace your technical interviews.
             </p>
@@ -98,17 +98,17 @@ function HomePage() {
             </div>
 
             {/* STATS */}
-            <div className="stats stats-vertical lg:stats-horizontal bg-base-100 shadow-lg">
+            <div className="stats stats-vertical lg:stats-horizontal bg-white shadow-md">
               <div className="stat">
-                <div className="stat-value text-primary">10K+</div>
+                <div className="stat-value text-blue-600">10K+</div>
                 <div className="stat-title">Active Users</div>
               </div>
               <div className="stat">
-                <div className="stat-value text-secondary">50K+</div>
+                <div className="stat-value text-indigo-600">50K+</div>
                 <div className="stat-title">Sessions</div>
               </div>
               <div className="stat">
-                <div className="stat-value text-accent">99.9%</div>
+                <div className="stat-value text-purple-600">99.9%</div>
                 <div className="stat-title">Uptime</div>
               </div>
             </div>
@@ -118,7 +118,7 @@ function HomePage() {
           <img
             src="/hero.png"
             alt="CodeCollab Platform"
-            className="w-full h-auto rounded-3xl shadow-2xl border-4 border-base-100 hover:scale-105 transition-transform duration-500"
+            className="w-full h-auto rounded-3xl shadow-xl border-4 border-white hover:scale-105 transition-transform duration-500"
           />
         </div>
       </div>
@@ -127,9 +127,9 @@ function HomePage() {
       <div className="max-w-7xl mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">
-            Everything You Need to <span className="text-primary font-mono">Succeed</span>
+            Everything You Need to <span className="text-blue-600 font-mono">Succeed</span>
           </h2>
-          <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
             Powerful features designed to make your coding interviews seamless and productive
           </p>
         </div>
@@ -137,39 +137,39 @@ function HomePage() {
         {/* FEATURES GRID */}
         <div className="grid md:grid-cols-3 gap-8">
           {/* Feature 1 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-white shadow-lg">
             <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <VideoIcon className="size-8 text-primary" />
+              <div className="size-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
+                <VideoIcon className="size-8 text-blue-600" />
               </div>
               <h3 className="card-title">HD Video Call</h3>
-              <p className="text-base-content/70">
+              <p className="text-gray-700">
                 Crystal clear video and audio for seamless communication during interviews
               </p>
             </div>
           </div>
 
           {/* Feature 2 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-white shadow-lg">
             <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <Code2Icon className="size-8 text-primary" />
+              <div className="size-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+                <Code2Icon className="size-8 text-indigo-600" />
               </div>
               <h3 className="card-title">Live Code Editor</h3>
-              <p className="text-base-content/70">
+              <p className="text-gray-700">
                 Collaborate in real-time with syntax highlighting and multiple language support
               </p>
             </div>
           </div>
 
           {/* Feature 3 */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-white shadow-lg">
             <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <UsersIcon className="size-8 text-primary" />
+              <div className="size-16 bg-purple-50 rounded-2xl flex items-center justify-center mb-4">
+                <UsersIcon className="size-8 text-purple-600" />
               </div>
               <h3 className="card-title">Easy Collaboration</h3>
-              <p className="text-base-content/70">
+              <p className="text-gray-700">
                 Share your screen, discuss solutions, and learn from each other in real-time
               </p>
             </div>
