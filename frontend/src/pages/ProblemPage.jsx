@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { PROBLEMS } from "../data/problems";
-import Navbar from "../components/Navbar";
 
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ProblemDescription from "../components/ProblemDescription";
@@ -107,9 +106,7 @@ function ProblemPage() {
   };
 
   return (
-    <div className="h-screen bg-white flex flex-col">
-      <Navbar />
-
+    <div className="h-screen flex flex-col bg-slate-50">
       <div className="flex-1">
         <PanelGroup direction="horizontal">
           {/* left panel- problem desc */}
@@ -122,7 +119,7 @@ function ProblemPage() {
             />
           </Panel>
 
-          <PanelResizeHandle className="w-2 bg-gray-200 hover:bg-blue-500 transition-colors cursor-col-resize" />
+          <PanelResizeHandle className="w-1.5 bg-slate-200 hover:bg-orange-400 transition-colors cursor-col-resize" />
 
           {/* right panel- code editor & output */}
           <Panel defaultSize={60} minSize={30}>
@@ -139,7 +136,7 @@ function ProblemPage() {
                 />
               </Panel>
 
-              <PanelResizeHandle className="h-2 bg-gray-200 hover:bg-blue-500 transition-colors cursor-row-resize" />
+              <PanelResizeHandle className="h-1.5 bg-slate-200 hover:bg-orange-400 transition-colors cursor-row-resize" />
 
               {/* Bottom panel - Output Panel*/}
 

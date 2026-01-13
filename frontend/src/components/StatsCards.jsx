@@ -1,32 +1,38 @@
-import { TrophyIcon, UsersIcon } from "lucide-react";
+import { Zap, Trophy, Clock } from "lucide-react";
 
-function StatsCards({ activeSessionsCount, recentSessionsCount }) {
+function StatsCards({ activeSessionsCount, recentSessionsCount, completedCount }) {
   return (
-    <div className="lg:col-span-1 grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       {/* Active Count */}
-      <div className="card bg-white border-2 border-blue-200 hover:border-blue-300">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-blue-50 rounded-2xl">
-              <UsersIcon className="w-7 h-7 text-blue-600" />
-            </div>
-            <div className="badge badge-primary">Live</div>
-          </div>
-          <div className="text-4xl font-black mb-1">{activeSessionsCount}</div>
-          <div className="text-sm opacity-60">Active Sessions</div>
+      <div className="glass-card p-6 flex items-center gap-5 group hover:border-orange-500/30 transition-colors">
+        <div className="size-14 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform duration-300">
+          <Zap className="size-7" />
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-white mb-1">{activeSessionsCount}</div>
+          <div className="text-sm font-medium text-[var(--text-secondary)]">Active Sessions</div>
         </div>
       </div>
 
-      {/* Recent Count */}
-      <div className="card bg-white border-2 border-indigo-200 hover:border-indigo-300">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-indigo-50 rounded-2xl">
-              <TrophyIcon className="w-7 h-7 text-indigo-600" />
-            </div>
-          </div>
-          <div className="text-4xl font-black mb-1">{recentSessionsCount}</div>
-          <div className="text-sm opacity-60">Total Sessions</div>
+      {/* Completed Count */}
+      <div className="glass-card p-6 flex items-center gap-5 group hover:border-green-500/30 transition-colors">
+        <div className="size-14 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform duration-300">
+          <Trophy className="size-7" />
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-white mb-1">{completedCount}</div>
+          <div className="text-sm font-medium text-[var(--text-secondary)]">Challenges Won</div>
+        </div>
+      </div>
+
+      {/* Total Sessions */}
+      <div className="glass-card p-6 flex items-center gap-5 group hover:border-blue-500/30 transition-colors">
+        <div className="size-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+          <Clock className="size-7" />
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-white mb-1">{recentSessionsCount}</div>
+          <div className="text-sm font-medium text-[var(--text-secondary)]">Total Sessions</div>
         </div>
       </div>
     </div>

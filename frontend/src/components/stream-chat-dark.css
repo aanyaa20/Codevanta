@@ -1,0 +1,53 @@
+:root {
+    --str-chat__primary-color: #6366f1; /* Indigo-500 matching --accent-primary */
+    --str-chat__active-primary-color: #4f46e5;
+    --str-chat__surface-color: #12121a; /* Matching --bg-secondary */
+    --str-chat__secondary-surface-color: #1a1a24; /* Matching --bg-tertiary */
+    --str-chat__primary-surface-color: #1a1a24;
+    --str-chat__primary-surface-color-low-emphasis: #252533;
+    --str-chat__border-radius-circle: 12px;
+    --str-chat__message-bubble-border-radius: 12px;
+    
+    /* Text Colors */
+    --str-chat__text-color: #f8fafc;
+    --str-chat__secondary-text-color: #94a3b8;
+    --str-chat__text-color-low-emphasis: #64748b;
+  
+    /* Input */
+    --str-chat__input-background-color: #0a0a0f;
+    --str-chat__input-border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .str-chat__list {
+    background: transparent !important;
+  }
+  
+  .str-chat__channel-list {
+    background: transparent !important;
+  }
+  
+  .str-chat__message-list {
+    background: transparent !important;
+  }
+  
+  .str-chat__input-flat {
+    background: transparent !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .str-chat__input-flat .str-chat__textarea {
+    background: var(--str-chat__input-background-color);
+    border: 1px solid var(--str-chat__input-border-color);
+    border-radius: 8px;
+  }
+  
+  /* Message bubbles */
+  .str-chat__message-simple__content--own {
+      background: var(--str-chat__primary-color);
+      border: none;
+  }
+  
+  .str-chat__message-simple__content--other {
+      background: var(--str-chat__secondary-surface-color);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+  }

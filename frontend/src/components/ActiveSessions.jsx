@@ -1,109 +1,122 @@
 import {
-  ArrowRightIcon,
-  Code2Icon,
-  CrownIcon,
-  SparklesIcon,
-  UsersIcon,
-  ZapIcon,
-  LoaderIcon,
+  ArrowRight,
+  Code2,
+  Crown,
+  Users,
+  Loader2,
+  Clock,
+  Sparkles
 } from "lucide-react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils";
 
-function ActiveSessions({ sessions, isLoading, isUserInSession }) {
-  return (
-    <div className="lg:col-span-2 card bg-white border-2 border-blue-200 hover:border-blue-300 h-full">
-      <div className="card-body">
-        {/* HEADERS SECTION */}
-        <div className="flex items-center justify-between mb-6">
-          {/* TITLE AND ICON */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl">
-              <ZapIcon className="size-5" />
-            </div>
-            <h2 className="text-2xl font-black">Live Sessions</h2>
-          </div>
+function ActiveSessions({ sessions = [], isLoading, isUserInSession }) {
+  if (isLoading) {
+    return (
+      <div className="card p-12 flex flex-col items-center justify-center gap-4 min-h-[200px] bg-white border-slate-200">
+        <Loader2 className="size-8 animate-spin text-[var(--accent-primary)]" />
+        <p className="text-[var(--text-secondary)] text-sm animate-pulse">Scanning active sessions...</p>
+      </div>
+    );
+  }
 
-          <div className="flex items-center gap-2">
-            <div className="size-2 bg-success rounded-full" />
-            <span className="text-sm font-medium text-success">{sessions.length} active</span>
-          </div>
+  if (sessions.length === 0) {
+    return (
+      <div className="card p-12 flex flex-col items-center justify-center text-center gap-6 min-h-[200px] bg-white border-slate-200">
+        <div className="size-16 rounded-full bg-slate-50 flex items-center justify-center">
+          <Sparkles className="size-8 text-slate-300" />
         </div>
-
-        {/* SESSIONS LIST */}
-        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <LoaderIcon className="size-10 animate-spin text-blue-600" />
-            </div>
-          ) : sessions.length > 0 ? (
-            sessions.map((session) => (
-              <div
-                key={session._id}
-                className="card bg-gray-50 border-2 border-gray-200 hover:border-blue-300"
-              >
-                <div className="flex items-center justify-between gap-4 p-5">
-                  {/* LEFT SIDE */}
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="relative size-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                      <Code2Icon className="size-7 text-white" />
-                      <div className="absolute -top-1 -right-1 size-4 bg-success rounded-full border-2 border-white" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-lg truncate">{session.problem}</h3>
-                        <span
-                          className={`badge badge-sm ${getDifficultyBadgeClass(
-                            session.difficulty
-                          )}`}
-                        >
-                          {session.difficulty.slice(0, 1).toUpperCase() +
-                            session.difficulty.slice(1)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-sm opacity-80">
-                        <div className="flex items-center gap-1.5">
-                          <CrownIcon className="size-4" />
-                          <span className="font-medium">{session.host?.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <UsersIcon className="size-4" />
-                          <span className="text-xs">{session.participant ? "2/2" : "1/2"}</span>
-                        </div>
-                        {session.participant && !isUserInSession(session) ? (
-                          <span className="badge badge-error badge-sm">FULL</span>
-                        ) : (
-                          <span className="badge badge-success badge-sm">OPEN</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {session.participant && !isUserInSession(session) ? (
-                    <button className="btn btn-disabled btn-sm">Full</button>
-                  ) : (
-                    <Link to={`/session/${session._id}`} className="btn btn-primary btn-sm gap-2">
-                      {isUserInSession(session) ? "Rejoin" : "Join"}
-                      <ArrowRightIcon className="size-4" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl flex items-center justify-center">
-                <SparklesIcon className="w-10 h-10 text-blue-500" />
-              </div>
-              <p className="text-lg font-semibold opacity-70 mb-1">No active sessions</p>
-              <p className="text-sm opacity-50">Be the first to create one!</p>
-            </div>
-          )}
+        <div>
+          <h3 className="text-lg font-semibold mb-1 text-slate-900">No Active Sessions</h3>
+          <p className="text-slate-500 text-sm max-w-sm mx-auto">
+            It's quiet right now. Why not start a new session?
+          </p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-3">
+      {sessions.map((session) => (
+        <div
+          key={session._id}
+          className="card p-4 group transition-all duration-200 hover:border-orange-200 hover:shadow-md bg-white border-slate-200"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            
+            {/* Session Info */}
+            <div className="flex items-start gap-4 flex-1 w-full">
+              <div className="relative shrink-0">
+                <div className="size-12 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-orange-50 transition-colors">
+                  <Code2 className="size-6 text-slate-400 group-hover:text-orange-500 transition-colors" />
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-base text-slate-900 truncate group-hover:text-[var(--accent-primary)] transition-colors">
+                    {session.problem}
+                  </h3>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+                      getDifficultyBadgeClass(session.difficulty)
+                    }`}
+                  >
+                    {session.difficulty}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
+                  <div className="flex items-center gap-1" title="Host">
+                    <Crown className="size-3 text-yellow-500" />
+                    <span className="font-medium">
+                      {session.host?.name || "Host"}
+                    </span>
+                  </div>
+
+                  <div className="w-1 h-1 rounded-full bg-slate-300" />
+
+                  <div className="flex items-center gap-1" title="Participants">
+                    <Users className="size-3" />
+                    <span>
+                      {session.participant ? "2/2" : "1/2"}
+                    </span>
+                  </div>
+
+                  <div className="w-1 h-1 rounded-full bg-slate-300" />
+
+                  <div className="flex items-center gap-1" title="Created">
+                    <Clock className="size-3" />
+                    <span>Now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="w-full sm:w-auto mt-2 sm:mt-0">
+              {session.participant && !isUserInSession(session) ? (
+                <button
+                  disabled
+                  className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-50 text-slate-400 text-xs font-semibold uppercase tracking-wider cursor-not-allowed border border-slate-100 flex items-center justify-center gap-2"
+                >
+                  Full
+                </button>
+              ) : (
+                <Link
+                  to={`/session/${session._id}`}
+                  className="btn-primary w-full sm:w-auto py-2 px-4 text-xs uppercase tracking-wider font-bold shadow-none hover:shadow-lg hover:shadow-orange-500/20"
+                >
+                  {isUserInSession(session) ? "Rejoin" : "Join"}
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
+
 export default ActiveSessions;

@@ -7,6 +7,9 @@ import DashboardPage from "./pages/DashboardPage";
 import ProblemPage from "./pages/ProblemPage";
 import ProblemsPage from "./pages/ProblemsPage";
 import SessionPage from "./pages/SessionPage";
+import SettingsPage from "./pages/SettingsPage";
+import LiveSessionsPage from "./pages/LiveSessionsPage";
+import HistoryPage from "./pages/HistoryPage";
 
 function App() {
   const { isSignedIn, isLoaded } = useUser();
@@ -23,6 +26,10 @@ function App() {
         <Route path="/problems" element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"} />} />
         <Route path="/problem/:id" element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />} />
         <Route path="/session/:id" element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />} />
+        
+        <Route path="/settings" element={isSignedIn ? <SettingsPage /> : <Navigate to={"/"} />} />
+        <Route path="/sessions/active" element={isSignedIn ? <LiveSessionsPage /> : <Navigate to={"/"} />} />
+        <Route path="/sessions/history" element={isSignedIn ? <HistoryPage /> : <Navigate to={"/"} />} />
       </Routes>
 
       <Toaster toastOptions={{ duration: 3000 }} />

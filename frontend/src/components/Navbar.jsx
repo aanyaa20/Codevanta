@@ -1,77 +1,92 @@
 import { Link, useLocation } from "react-router";
-import { BookOpenIcon, LayoutDashboardIcon, SparklesIcon } from "lucide-react";
-import { UserButton } from "@clerk/clerk-react";
+import { useUser, UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import CreateSessionModal from "./CreateSessionModal";
+import { useCreateSession } from "../hooks/useSessions";
+import { useNavigate } from "react-router";
 
-function Navbar() {
+function Navbar({ collapsed }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [roomConfig, setRoomConfig] = useState({
+      problem: "",
+      difficulty: "",
+  });
+  
+  const createSessionMutation = useCreateSession();
 
-  console.log(location);
+  const getPageTitle = (pathname) => {
+    if (pathname.includes("/dashboard")) return "Dashboard";
+    if (pathname.includes("/problems")) return "Problems";
+    if (pathname.includes("/sessions/active")) return "Live Sessions";
+    if (pathname.includes("/sessions/history")) return "History";
+    if (pathname.includes("/settings")) return "Settings";
+    if (pathname.includes("/session/")) return "Active Session";
+    if (pathname.includes("/problem/")) return "Solving Problem";
+    return "Dashboard";
+  };
+  
+  const handleCreateRoom = () => {
+    if (!roomConfig.problem || !roomConfig.difficulty) return;
 
-  const isActive = (path) => location.pathname === path;
+    createSessionMutation.mutate(
+      {
+        problem: roomConfig.problem,
+        difficulty: roomConfig.difficulty.toLowerCase(),
+      },
+      {
+        onSuccess: (data) => {
+          setShowCreateModal(false);
+          navigate(`/session/${data.session._id}`);
+        },
+      }
+    );
+  };
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
-        {/* LOGO */}
-        <Link
-          to="/"
-          className="group flex items-center gap-3 hover:scale-105 transition-transform duration-200"
-        >
-          <div className="size-10 rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 flex items-center justify-center shadow-md ">
-            <SparklesIcon className="size-6 text-white" />
-          </div>
-
-          <div className="flex flex-col">
-            <span className="font-black text-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent font-mono tracking-wider">
-              CodeVanta
-            </span>
-            <span className="text-xs text-gray-600 font-medium -mt-1">Code Together</span>
-          </div>
-        </Link>
-
-        <div className="flex items-center gap-1">
-          {/* PROBLEMS PAGE LINK */}
-          <Link
-            to={"/problems"}
-            className={`px-4 py-2.5 rounded-lg transition-all duration-200 
-              ${
-                isActive("/problems")
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
-              }
-              
-              `}
-          >
-            <div className="flex items-center gap-x-2.5">
-              <BookOpenIcon className="size-4" />
-              <span className="font-medium hidden sm:inline">Problems</span>
-            </div>
-          </Link>
-
-          {/* DASHBORD PAGE LINK */}
-          <Link
-            to={"/dashboard"}
-            className={`px-4 py-2.5 rounded-lg transition-all duration-200 
-              ${
-                isActive("/dashboard")
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
-              }
-              
-              `}
-          >
-            <div className="flex items-center gap-x-2.5">
-              <LayoutDashboardIcon className="size-4" />
-              <span className="font-medium hidden sm:inline">Dashbord</span>
-            </div>
-          </Link>
-
-          <div className="ml-4 mt-2">
-            <UserButton />
-          </div>
-        </div>
+    <>
+    <header className="h-16 bg-white border-b border-[var(--border-subtle)] flex items-center justify-between px-6 md:px-8 shadow-sm z-40 relative">
+      <div className="flex items-center gap-4">
+        <h1 className="text-xl font-bold text-[var(--text-primary)]">
+          {getPageTitle(location.pathname)}
+        </h1>
       </div>
-    </nav>
+
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={() => setShowCreateModal(true)}
+          className="btn-primary rounded-full px-5 py-2 text-sm shadow-orange-500/20"
+        >
+          <Plus className="size-4" />
+          <span>Create New</span>
+        </button>
+        
+        <div className="h-8 w-px bg-slate-200 mx-2 hidden md:block"></div>
+        
+        <SignedIn>
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "size-9 border-2 border-slate-100"
+              }
+            }}
+          />
+        </SignedIn>
+      </div>
+    </header>
+    
+    <CreateSessionModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        roomConfig={roomConfig}
+        setRoomConfig={setRoomConfig}
+        onCreateRoom={handleCreateRoom}
+        isCreating={createSessionMutation.isPending}
+      />
+    </>
   );
 }
+
 export default Navbar;

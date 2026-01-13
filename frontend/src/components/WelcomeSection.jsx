@@ -1,37 +1,39 @@
+// This component is deprecated as it has been integrated directly into the DashboardPage for better layout control.
+// Keeping it as a reference or for potential reuse in other pages.
+
 import { useUser } from "@clerk/clerk-react";
-import { ArrowRightIcon, SparklesIcon, ZapIcon } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 
 function WelcomeSection({ onCreateSession }) {
   const { user } = useUser();
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="relative max-w-7xl mx-auto px-6 py-16">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                <SparklesIcon className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-5xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Welcome back, {user?.firstName || "there"}!
-              </h1>
+    <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-white/10 p-8 md:p-12 mb-10">
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-96 h-96 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="size-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+              <Sparkles className="size-6 text-white" />
             </div>
-            <p className="text-xl text-gray-700 ml-16">
-              Ready to level up your coding skills?
-            </p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
+              Welcome back, {user?.firstName || "Developer"}!
+            </h1>
           </div>
-          <button
-            onClick={onCreateSession}
-            className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl transition-all duration-200 hover:opacity-90"
-          >
-            <div className="flex items-center gap-3 text-white font-bold text-lg">
-              <ZapIcon className="w-6 h-6" />
-              <span>Create Session</span>
-              <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
+          <p className="text-lg text-[var(--text-secondary)] max-w-xl pl-1">
+            Ready to level up your coding skills? Start a new live pair programming session now.
+          </p>
         </div>
+        
+        <button
+          onClick={onCreateSession}
+          className="btn-primary group text-lg px-8 py-4"
+        >
+          <Zap className="size-5" />
+          <span>Start Live Session</span>
+          <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
+        </button>
       </div>
     </div>
   );

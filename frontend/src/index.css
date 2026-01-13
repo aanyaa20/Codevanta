@@ -1,19 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: all;
+
+/* -------------------------
+   DESIGN TOKENS (OPTIONAL)
+-------------------------- */
+@theme {
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-bg-tertiary: #1a1a24;
+
+  --color-accent-primary: #ec4899;
+  --color-accent-secondary: #f97316;
+  --color-accent-glow: rgba(236, 72, 153, 0.15);
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-highlight: rgba(255, 255, 255, 0.12);
+
+  --font-display: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
-/* Add cursor pointer to buttons by default - this is coming from tailwind docs */
+/* -------------------------
+   BASE THEME
+-------------------------- */
 @layer base {
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
+  :root {
+    /* Light Theme */
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F1F5F9;
+
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-tertiary: #94A3B8;
+
+    --accent-primary: #F97316;
+    --accent-hover: #EA580C;
+    --accent-subtle: #FFF7ED;
+
+    --border-subtle: #E2E8F0;
+    --border-highlight: #CBD5E1;
+
+    --shadow-soft: 0 1px 3px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 4px 6px rgb(0 0 0 / 0.1);
+  }
+
+  [data-theme="dark"] {
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-tertiary: #334155;
+
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-tertiary: #64748B;
+
+    --accent-primary: #F97316;
+    --accent-hover: #EA580C;
+    --accent-subtle: rgba(249, 115, 22, 0.1);
+
+    --border-subtle: #334155;
+    --border-highlight: #475569;
+
+    --shadow-soft: 0 4px 6px rgb(0 0 0 / 0.5);
+    --shadow-card: 0 10px 15px rgb(0 0 0 / 0.5);
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)]
+           text-[var(--text-primary)]
+           antialiased;
+    font-family: var(--font-display);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-[var(--text-primary)];
   }
 }
 
-/* Custom light theme color overrides */
-:root {
-  --gradient-from: #3b82f6; /* Blue */
-  --gradient-via: #6366f1; /* Indigo */
-  --gradient-to: #8b5cf6; /* Purple */
+/* -------------------------
+   COMPONENTS (NO CLASS REUSE)
+-------------------------- */
+@layer components {
+
+  /* Cards */
+  .card {
+    @apply bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           rounded-xl
+           shadow-sm
+           transition-shadow duration-200;
+  }
+
+  .card-hover {
+    @apply bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           rounded-xl
+           shadow-sm
+           transition-shadow duration-200
+           hover:shadow-md
+           cursor-pointer;
+  }
+
+  /* Legacy glass names mapped cleanly */
+  .glass-card {
+    @apply bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           rounded-xl
+           shadow-sm;
+  }
+
+  .glass-card-hover {
+    @apply bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           rounded-xl
+           shadow-sm
+           hover:shadow-md
+           cursor-pointer;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-5 py-2.5
+           rounded-lg
+           font-semibold
+           text-white
+           bg-[var(--accent-primary)]
+           hover:bg-[var(--accent-hover)]
+           transition-all duration-200
+           shadow-sm
+           active:scale-[0.98]
+           flex items-center justify-center gap-2
+           text-sm;
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5
+           rounded-lg
+           font-medium
+           text-[var(--text-primary)]
+           bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           hover:bg-[var(--bg-tertiary)]
+           hover:border-[var(--border-highlight)]
+           transition-all duration-200
+           shadow-sm
+           flex items-center justify-center gap-2
+           text-sm;
+  }
+
+  .btn-ghost {
+    @apply p-2
+           rounded-lg
+           text-[var(--text-secondary)]
+           hover:text-[var(--text-primary)]
+           hover:bg-[var(--bg-tertiary)]
+           transition-colors;
+  }
+
+  /* Inputs */
+  .input-modern {
+    @apply w-full
+           bg-[var(--bg-secondary)]
+           border border-[var(--border-subtle)]
+           text-[var(--text-primary)]
+           rounded-lg
+           px-4 py-2.5
+           focus:outline-none
+           focus:border-[var(--accent-primary)]
+           focus:ring-1
+           focus:ring-[var(--accent-primary)]
+           transition-all
+           placeholder:text-[var(--text-tertiary)]
+           shadow-sm;
+  }
+}
+
+/* -------------------------
+   SCROLLBAR
+-------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+}
+
+/* -------------------------
+   ANIMATIONS
+-------------------------- */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
