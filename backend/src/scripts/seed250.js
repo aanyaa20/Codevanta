@@ -204,16 +204,16 @@ for (let i = 11; i <= 250; i++) {
 
 async function seed() {
   try {
-    console.log("🔌 Connecting...");
+    console.log("Connecting...");
     await mongoose.connect(ENV.DB_URL);
     console.log("✅ Connected");
-    console.log("🗑️  Clearing...");
+    console.log(" Clearing...");
     await Problem.deleteMany({});
     console.log("✅ Cleared");
-    console.log("📝 Inserting 250 problems...");
+    console.log(" Inserting 250 problems...");
     await Problem.insertMany(problems);
     console.log("✅ 250 problems inserted!");
-    console.log(`📊 Easy: ${problems.filter(p=>p.difficulty==="Easy").length}, Medium: ${problems.filter(p=>p.difficulty==="Medium").length}, Hard: ${problems.filter(p=>p.difficulty==="Hard").length}`);
+    console.log(` Easy: ${problems.filter(p=>p.difficulty==="Easy").length}, Medium: ${problems.filter(p=>p.difficulty==="Medium").length}, Hard: ${problems.filter(p=>p.difficulty==="Hard").length}`);
     process.exit(0);
   } catch (error) {
     console.error("❌ Error:", error);

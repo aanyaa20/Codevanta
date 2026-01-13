@@ -17,17 +17,6 @@ function Navbar({ collapsed }) {
   
   const createSessionMutation = useCreateSession();
 
-  const getPageTitle = (pathname) => {
-    if (pathname.includes("/dashboard")) return "Dashboard";
-    if (pathname.includes("/problems")) return "Problems";
-    if (pathname.includes("/sessions/active")) return "Live Sessions";
-    if (pathname.includes("/sessions/history")) return "History";
-    if (pathname.includes("/settings")) return "Settings";
-    if (pathname.includes("/session/")) return "Active Session";
-    if (pathname.includes("/problem/")) return "Solving Problem";
-    return "Dashboard";
-  };
-  
   const handleCreateRoom = () => {
     if (!roomConfig.problem || !roomConfig.difficulty) return;
 
@@ -49,9 +38,7 @@ function Navbar({ collapsed }) {
     <>
     <header className="h-16 bg-white border-b border-[var(--border-subtle)] flex items-center justify-between px-6 md:px-8 shadow-sm z-40 relative">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold text-[var(--text-primary)]">
-          {getPageTitle(location.pathname)}
-        </h1>
+        <img src="/logo.svg" alt="CodeVanta" className="h-8" />
       </div>
 
       <div className="flex items-center gap-4">
