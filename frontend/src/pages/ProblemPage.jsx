@@ -227,7 +227,10 @@ function ProblemPage() {
 
               {/* Bottom panel - Output Panel */}
               <Panel defaultSize={30} minSize={20}>
-                <OutputPanel output={output} />
+                <OutputPanel 
+                  testResults={output} 
+                  isRunning={isRunning}
+                />
               </Panel>
             </PanelGroup>
           </Panel>

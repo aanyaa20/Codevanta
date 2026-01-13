@@ -25,6 +25,14 @@ function LiveSessionsPage() {
 
   return (
     <DashboardLayout>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2 text-slate-900">Live Sessions</h1>
+        <p className="text-slate-500 text-lg">
+          Join active coding sessions and collaborate with other developers in real-time.
+        </p>
+      </div>
+
        {/* Stats Card */}
        <div className="card p-6 flex items-center justify-between border-l-4 border-l-orange-500 bg-white shadow-sm">
           <div className="flex items-center gap-6">
