@@ -24,3 +24,22 @@ export const protectRoute = [
     }
   },
 ];
+
+// Optional auth middleware - attaches user if authenticated but doesn't require it
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const clerkId = req.auth?.()?.userId;
+
+    if (clerkId) {
+      const user = await User.findOne({ clerkId });
+      if (user) {
+        req.user = user;
+      }
+    }
+
+    next();
+  } catch (error) {
+    // Continue without user if auth fails
+    next();
+  }
+};

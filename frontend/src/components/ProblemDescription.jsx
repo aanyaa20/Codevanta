@@ -1,65 +1,40 @@
 import { getDifficultyBadgeClass } from "../lib/utils";
 
-function ProblemDescription({ problem, currentProblemId, onProblemChange, allProblems, isSessionMode = false }) {
-  // If we are in session mode, we might want a simplified view or specific styling
-  
+function ProblemDescription({ problem }) {
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-white border-r border-slate-200">
-      
       {/* HEADER SECTION */}
-      {!isSessionMode && (
-          <div className="card p-6 mb-6">
-            <div className="flex items-start justify-between mb-4">
-              <h1 className="text-2xl font-bold text-slate-900">{problem.title}</h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                problem.difficulty === "easy" ? "bg-green-100 text-green-700" :
-                problem.difficulty === "medium" ? "bg-amber-100 text-amber-700" :
-                "bg-red-100 text-red-700"
-              }`}>
-                {problem.difficulty}
+      <div className="card p-6 mb-6">
+        <div className="flex items-start justify-between mb-4">
+          <h1 className="text-2xl font-bold text-slate-900">{problem.title}</h1>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${getDifficultyBadgeClass(
+              problem.difficulty
+            )}`}
+          >
+            {problem.difficulty}
+          </span>
+        </div>
+        {problem.tags && problem.tags.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {problem.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200"
+              >
+                {tag}
               </span>
-            </div>
-            <p className="text-slate-500 text-sm mb-4">{problem.category}</p>
-
-            {/* Problem selector - Only show if we can change problems */}
-             <div className="relative">
-                <select
-                    className="input-modern w-full text-sm appearance-none cursor-pointer"
-                    value={currentProblemId}
-                    onChange={(e) => onProblemChange(e.target.value)}
-                >
-                    {allProblems.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-white text-slate-900">
-                        {p.title} ({p.difficulty})
-                    </option>
-                    ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    ▼
-                </div>
-            </div>
+            ))}
           </div>
-      )}
-
-      {/* If in session mode, maybe just show title simpler */}
-      {isSessionMode && (
-          <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold text-slate-900">Description</h2>
-              </div>
-          </div>
-      )}
-
+        )}
+      </div>
 
       <div className="space-y-8">
         {/* DESCRIPTION TEXT */}
         <div className="prose prose-slate max-w-none">
-            <p className="text-slate-600 leading-relaxed text-sm">{problem.description.text}</p>
-            {problem.description.notes.map((note, idx) => (
-                <p key={idx} className="text-slate-500 italic text-sm mt-2 border-l-2 border-blue-500/50 pl-3 bg-blue-50 py-1 pr-2 rounded-r">
-                  Note: {note}
-                </p>
-            ))}
+          <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap">
+            {problem.description}
+          </p>
         </div>
 
         {/* EXAMPLES SECTION */}

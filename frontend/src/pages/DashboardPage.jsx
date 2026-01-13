@@ -22,7 +22,7 @@ import {
 
 import DashboardLayout from "../components/DashboardLayout";
 import ActiveSessions from "../components/ActiveSessions";
-import RecentSessions from "../components/RecentSessions";
+import RecentActivity from "../components/RecentActivity";
 import CreateSessionModal from "../components/CreateSessionModal";
 import InvitePartnerModal from "../components/InvitePartnerModal";
 
@@ -165,64 +165,16 @@ function DashboardPage() {
         {/* Left Column: Recent Activity / History Table */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-             <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
+             <h2 className="text-lg font-bold text-slate-900">Problems Solved</h2>
              <button 
-                onClick={() => navigate("/sessions/history")}
+                onClick={() => navigate("/problems")}
                 className="text-sm text-orange-600 hover:text-orange-700 font-medium hover:underline"
               >
-                View Full History
+                View All
               </button>
           </div>
           
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm min-h-[400px]">
-             {/* Table Header */}
-             <div className="grid grid-cols-12 gap-4 p-4 border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <div className="col-span-5">Challenge</div>
-                <div className="col-span-3">Status</div>
-                <div className="col-span-2">Type</div>
-                <div className="col-span-2 text-right">Date</div>
-             </div>
-             
-             {/* Table Body */}
-             <div className="divide-y divide-slate-100">
-               {loadingRecentSessions ? (
-                 <div className="p-8 text-center text-slate-500">Loading history...</div>
-               ) : recentSessions.length > 0 ? (
-                 recentSessions.slice(0, 6).map((session) => (
-                   <div key={session._id} className="grid grid-cols-12 gap-4 p-4 hover:bg-slate-50 transition-colors items-center group cursor-pointer" onClick={() => navigate(`/session/${session._id}`)}>
-                      <div className="col-span-5 font-medium text-slate-700 truncate flex items-center gap-3">
-                         <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${session.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
-                           <Code2 className="size-4" />
-                         </div>
-                         <span className="truncate">{session.problem}</span>
-                      </div>
-                      <div className="col-span-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
-                          session.status === "completed" 
-                            ? "bg-green-50 text-green-600 border-green-100" 
-                            : "bg-orange-50 text-orange-600 border-orange-100"
-                        }`}>
-                          {session.status}
-                        </span>
-                      </div>
-                      <div className="col-span-2 text-slate-500 text-sm">
-                        {session.difficulty}
-                      </div>
-                      <div className="col-span-2 text-right text-slate-400 text-sm">
-                        {new Date(session.createdAt).toLocaleDateString()}
-                      </div>
-                   </div>
-                 ))
-               ) : (
-                  <div className="p-12 text-center">
-                    <div className="size-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Clock className="size-6 text-slate-300" />
-                    </div>
-                    <p className="text-slate-500">No activity yet. Start a session!</p>
-                  </div>
-               )}
-             </div>
-          </div>
+          <RecentActivity />
         </div>
 
         {/* Right Column: Active Live Sessions List */}

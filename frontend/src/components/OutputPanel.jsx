@@ -1,60 +1,85 @@
-import { TerminalIcon, AlertCircleIcon, CheckCircleIcon } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
-function OutputPanel({ output }) {
+function OutputPanel({ output, testResults, isRunning }) {
+  // Handle new online judge result format
+  const status = testResults?.status;
+  const passedCount = testResults?.passedCount || 0;
+  const totalCount = testResults?.totalCount || 0;
+  const failedTestIndex = testResults?.failedTestIndex;
+  const expectedOutput = testResults?.expectedOutput;
+  const actualOutput = testResults?.actualOutput;
+  const errorMessage = testResults?.errorMessage;
+
   return (
-    <div className="h-full flex flex-col bg-white border-t border-slate-200">
-       {/* Output Header */}
-       <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
-            <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                <TerminalIcon className="size-3.5" />
-                Console Output
-            </div>
-            
-            {/* Status Indicator */}
-            {output && (
-                <div className={`flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${
-                    output.success 
-                        ? "bg-green-100 text-green-600" 
-                        : "bg-red-100 text-red-600"
-                }`}>
-                    {output.success ? (
-                        <>
-                            <CheckCircleIcon className="size-3" />
-                            Success
-                        </>
-                    ) : (
-                        <>
-                            <AlertCircleIcon className="size-3" />
-                            Error
-                        </>
-                    )}
-                </div>
-            )}
-       </div>
-
-
-      <div className="flex-1 overflow-auto p-4 font-mono text-sm">
-        {output === null ? (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-3 opacity-70">
-             <TerminalIcon className="size-12" />
-             <p>Run your code to see the output here</p>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+        <h3 className="text-sm font-semibold text-slate-700">Output</h3>
+        {isRunning && (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Loader2 className="size-4 animate-spin" />
+            Running...
           </div>
-        ) : output.success ? (
-          <pre className="text-slate-800 whitespace-pre-wrap leading-relaxed">{output.output}</pre>
-        ) : (
-          <div className="space-y-2">
-            {output.output && (
-              <pre className="text-slate-500 whitespace-pre-wrap opacity-80">
-                {output.output}
-              </pre>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-auto p-4">
+        {status ? (
+          <div className="space-y-4">
+            {/* Status Badge */}
+            <div className={`p-4 rounded-lg border-2 ${
+              status === "Accepted" ? "bg-green-50 border-green-500" :
+              status === "Wrong Answer" ? "bg-red-50 border-red-500" :
+              status === "Runtime Error" ? "bg-orange-50 border-orange-500" :
+              status === "Compilation Error" ? "bg-yellow-50 border-yellow-500" :
+              "bg-purple-50 border-purple-500"
+            }`}>
+              <div className="flex items-center gap-2 mb-2">
+                {status === "Accepted" ? (
+                  <CheckCircle2 className="size-6 text-green-600" />
+                ) : (
+                  <XCircle className="size-6 text-red-600" />
+                )}
+                <span className="text-lg font-bold">{status}</span>
+              </div>
+              <div className="text-sm font-medium">
+                Test Cases Passed: {passedCount} / {totalCount}
+              </div>
+            </div>
+
+            {/* Error or Failed Test Details */}
+            {status !== "Accepted" && (
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                {errorMessage ? (
+                  <div>
+                    <h4 className="text-sm font-semibold text-red-600 mb-2">Error Message:</h4>
+                    <pre className="text-xs bg-red-50 p-3 rounded text-red-800 overflow-x-auto">{errorMessage}</pre>
+                  </div>
+                ) : failedTestIndex !== null && failedTestIndex !== undefined ? (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-slate-700">Failed at Test Case {failedTestIndex + 1}</h4>
+                    <div>
+                      <span className="text-xs font-medium text-slate-600">Expected:</span>
+                      <pre className="mt-1 p-2 bg-white rounded text-xs text-slate-800">{String(expectedOutput)}</pre>
+                    </div>
+                    <div>
+                      <span className="text-xs font-medium text-slate-600">Your Output:</span>
+                      <pre className="mt-1 p-2 bg-red-100 rounded text-xs text-red-800">{String(actualOutput)}</pre>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             )}
-            <pre className="text-red-600 whitespace-pre-wrap border-l-2 border-red-500/50 pl-3 bg-red-50 py-1 rounded-r">
-                {output.error}
-            </pre>
+          </div>
+        ) : output ? (
+          <pre className="text-sm text-slate-700 font-mono whitespace-pre-wrap">{output}</pre>
+        ) : (
+          <div className="flex items-center justify-center h-full text-slate-400">
+            <p className="text-sm">Run your code to see output here</p>
           </div>
         )}
       </div>
     </div>
   );
 }
+
 export default OutputPanel;
