@@ -10,7 +10,7 @@ import {
   ChevronRight,
   LogOut
 } from "lucide-react";
-import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 import { useState } from "react";
 
 function Sidebar({ collapsed, setCollapsed }) {
@@ -33,8 +33,8 @@ function Sidebar({ collapsed, setCollapsed }) {
         ${collapsed ? "w-20" : "w-[240px]"}`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center px-6 border-b border-[var(--border-subtle)] bg-white/50 backdrop-blur-sm">
-        <Link to="/" className="flex items-center gap-3 group w-full">
+      <div className={`h-16 flex items-center border-b border-[var(--border-subtle)] bg-white/50 backdrop-blur-sm ${collapsed ? 'justify-center px-4' : 'px-6'}`}>
+        <Link to="/" className="flex items-center gap-3 group">
           <div className="size-8 rounded-lg bg-[var(--accent-primary)] flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform duration-300">
             <Code2 className="size-5 text-white" />
           </div>
@@ -98,9 +98,10 @@ function Sidebar({ collapsed, setCollapsed }) {
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 size-6 bg-white border border-[var(--border-subtle)] rounded-full flex items-center justify-center text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-all shadow-sm z-50"
+        className="absolute -right-3 top-20 size-7 bg-white border-2 border-[var(--border-subtle)] rounded-full flex items-center justify-center text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] hover:shadow-md transition-all shadow-sm z-[100]"
+        title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
       >
-        {collapsed ? <ChevronRight className="size-3" /> : <ChevronLeft className="size-3" />}
+        {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
       </button>
     </aside>
   );
