@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -15,7 +15,9 @@ import {
   MessageSquare,
   Globe
 } from "lucide-react";
-import { SignInButton, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import LandingNavbar from "../components/LandingNavbar";
+import { AUTH_INTENTS, setAuthIntent } from "../lib/authIntent";
 
 // Animated Counter Component
 function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
@@ -144,6 +146,8 @@ const problems = [
 
 function HomePage() {
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
+  const navigate = useNavigate();
+  const { isSignedIn } = useUser();
   
   // Flip between problems every 4 seconds
   useEffect(() => {
@@ -152,6 +156,31 @@ function HomePage() {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  // Handle CTA clicks with intent tracking
+  const handleGetStarted = () => {
+    if (isSignedIn) {
+      navigate('/dashboard');
+    } else {
+      setAuthIntent(AUTH_INTENTS.GET_STARTED);
+    }
+  };
+
+  const handleStartCoding = () => {
+    if (isSignedIn) {
+      navigate('/dashboard');
+    } else {
+      setAuthIntent(AUTH_INTENTS.START_CODING);
+    }
+  };
+
+  const handleExploreProblems = () => {
+    if (isSignedIn) {
+      navigate('/problems');
+    } else {
+      setAuthIntent(AUTH_INTENTS.EXPLORE_PROBLEMS);
+    }
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -171,71 +200,8 @@ function HomePage() {
       <FloatingBlob className="w-80 h-80 bg-teal-400/20 bottom-40 left-1/4" delay={4} />
       <FloatingBlob className="w-96 h-96 bg-green-300/15 bottom-20 right-1/4" delay={6} />
 
-      {/* NAVBAR */}
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="sticky top-0 z-50 backdrop-blur-xl bg-white/40 border-b border-white/60"
-      >
-        <nav className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300 group-hover:scale-105">
-              <Code2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
-              CodeVanta
-            </span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/problems" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
-              Problems
-            </Link>
-            <Link to="/sessions" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
-              Sessions
-            </Link>
-            <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
-              Dashboard
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignInButton mode="modal">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-medium text-sm shadow-lg shadow-cyan-500/25 overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative flex items-center gap-2">
-                    Get Started
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </motion.button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/dashboard">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-medium text-sm shadow-lg shadow-cyan-500/25 overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative">Dashboard</span>
-                </motion.button>
-              </Link>
-            </SignedIn>
-          </div>
-        </nav>
-      </motion.header>
+      {/* LANDING NAVBAR - Conditional based on auth */}
+      <LandingNavbar onGetStarted={handleGetStarted} />
 
       {/* HERO SECTION */}
       <section className="relative w-full min-h-screen overflow-hidden">
@@ -507,42 +473,71 @@ function HomePage() {
                   transition={{ duration: 0.8, delay: 1.1, ease: "easeOut" }}
                   className="flex flex-col sm:flex-row items-center lg:items-start gap-4"
                 >
-                  <SignInButton mode="modal">
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-semibold text-lg shadow-2xl shadow-cyan-500/40 overflow-hidden group"
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-500"
-                        initial={{ x: "100%" }}
-                        whileHover={{ x: "0%" }}
-                        transition={{ duration: 0.5 }}
-                      />
-                      <span className="relative flex items-center gap-2">
-                        Start Coding Now
-                        <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                      </span>
-                      
-                      {/* Glow Effect */}
-                      <motion.div
-                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-400 -z-10"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 0.6 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </motion.button>
-                  </SignInButton>
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <motion.button
+                        onClick={handleStartCoding}
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-semibold text-lg shadow-2xl shadow-cyan-500/40 overflow-hidden group"
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-500"
+                          initial={{ x: "100%" }}
+                          whileHover={{ x: "0%" }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <span className="relative flex items-center gap-2">
+                          Start Coding Now
+                          <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        </span>
+                        
+                        {/* Glow Effect */}
+                        <motion.div
+                          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-400 -z-10"
+                          initial={{ opacity: 0 }}
+                          whileHover={{ opacity: 0.6 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </motion.button>
+                    </SignInButton>
 
-                  <Link to="/problems">
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="px-8 py-4 rounded-2xl backdrop-blur-md bg-white/60 border border-white/80 text-slate-700 font-semibold text-lg shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-300"
-                    >
-                      Explore Problems
-                    </motion.button>
-                  </Link>
+                    <SignInButton mode="modal">
+                      <motion.button
+                        onClick={handleExploreProblems}
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-8 py-4 rounded-2xl backdrop-blur-md bg-white/60 border border-white/80 text-slate-700 font-semibold text-lg shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-300"
+                      >
+                        Explore Problems
+                      </motion.button>
+                    </SignInButton>
+                  </SignedOut>
+
+                  <SignedIn>
+                    <Link to="/dashboard">
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-semibold text-lg shadow-2xl shadow-cyan-500/40 overflow-hidden group"
+                      >
+                        <span className="relative flex items-center gap-2">
+                          Go to Dashboard
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </motion.button>
+                    </Link>
+
+                    <Link to="/problems">
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-8 py-4 rounded-2xl backdrop-blur-md bg-white/60 border border-white/80 text-slate-700 font-semibold text-lg shadow-lg hover:bg-white/80 hover:shadow-xl transition-all duration-300"
+                      >
+                        Browse Problems
+                      </motion.button>
+                    </Link>
+                  </SignedIn>
                 </motion.div>
               </div>
 
