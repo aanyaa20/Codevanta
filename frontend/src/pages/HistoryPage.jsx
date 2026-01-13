@@ -19,6 +19,14 @@ function HistoryPage() {
 
   return (
     <DashboardLayout>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2 text-slate-900">History</h1>
+        <p className="text-slate-500 text-lg">
+          Review your past coding sessions and track your progress.
+        </p>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="card p-6 flex items-center gap-6 group hover:border-orange-200 transition-colors bg-white">

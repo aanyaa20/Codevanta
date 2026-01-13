@@ -1,14 +1,20 @@
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 function OutputPanel({ output, testResults, isRunning }) {
+  // Use testResults if available, otherwise fall back to output
+  const data = testResults || output;
+  
   // Handle new online judge result format
-  const status = testResults?.status;
-  const passedCount = testResults?.passedCount || 0;
-  const totalCount = testResults?.totalCount || 0;
-  const failedTestIndex = testResults?.failedTestIndex;
-  const expectedOutput = testResults?.expectedOutput;
-  const actualOutput = testResults?.actualOutput;
-  const errorMessage = testResults?.errorMessage;
+  const status = data?.status;
+  const passedCount = data?.passed || data?.passedCount || 0;
+  const totalCount = data?.total || data?.totalCount || 0;
+  const results = data?.results || [];
+  const errorMessage = data?.errorMessage;
+  const runtime = data?.runtime;
+
+  // Find first failed test
+  const failedTest = results.find(r => !r.passed);
+  const failedTestIndex = failedTest ? results.indexOf(failedTest) : null;
 
   return (
     <div className="flex flex-col h-full">
@@ -44,6 +50,11 @@ function OutputPanel({ output, testResults, isRunning }) {
               <div className="text-sm font-medium">
                 Test Cases Passed: {passedCount} / {totalCount}
               </div>
+              {runtime && (
+                <div className="text-xs text-slate-600 mt-1">
+                  Runtime: {runtime}ms
+                </div>
+              )}
             </div>
 
             {/* Error or Failed Test Details */}
@@ -54,16 +65,20 @@ function OutputPanel({ output, testResults, isRunning }) {
                     <h4 className="text-sm font-semibold text-red-600 mb-2">Error Message:</h4>
                     <pre className="text-xs bg-red-50 p-3 rounded text-red-800 overflow-x-auto">{errorMessage}</pre>
                   </div>
-                ) : failedTestIndex !== null && failedTestIndex !== undefined ? (
+                ) : failedTest ? (
                   <div className="space-y-3">
                     <h4 className="text-sm font-semibold text-slate-700">Failed at Test Case {failedTestIndex + 1}</h4>
                     <div>
+                      <span className="text-xs font-medium text-slate-600">Input:</span>
+                      <pre className="mt-1 p-2 bg-white rounded text-xs text-slate-800">{JSON.stringify(failedTest.input)}</pre>
+                    </div>
+                    <div>
                       <span className="text-xs font-medium text-slate-600">Expected:</span>
-                      <pre className="mt-1 p-2 bg-white rounded text-xs text-slate-800">{String(expectedOutput)}</pre>
+                      <pre className="mt-1 p-2 bg-white rounded text-xs text-slate-800">{JSON.stringify(failedTest.expected)}</pre>
                     </div>
                     <div>
                       <span className="text-xs font-medium text-slate-600">Your Output:</span>
-                      <pre className="mt-1 p-2 bg-red-100 rounded text-xs text-red-800">{String(actualOutput)}</pre>
+                      <pre className="mt-1 p-2 bg-red-100 rounded text-xs text-red-800">{JSON.stringify(failedTest.actual)}</pre>
                     </div>
                   </div>
                 ) : null}

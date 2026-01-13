@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import {
   LayoutDashboard,
   BookOpen,
@@ -16,6 +16,8 @@ import { useState } from "react";
 function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
   const { user } = useUser();
+  const { signOut } = useClerk();
+  const navigate = useNavigate();
   
   const menuItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -34,14 +36,20 @@ function Sidebar({ collapsed, setCollapsed }) {
     >
       {/* Brand Header */}
       <div className={`h-16 flex items-center border-b border-[var(--border-subtle)] bg-white/50 backdrop-blur-sm ${collapsed ? 'justify-center px-4' : 'px-6'}`}>
-        <Link to="/" className="flex items-center gap-3 group">
+        <button 
+          onClick={async () => {
+            await signOut();
+            navigate('/');
+          }}
+          className="flex items-center gap-3 group cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <div className="size-8 rounded-lg bg-[var(--accent-primary)] flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform duration-300">
             <Code2 className="size-5 text-white" />
           </div>
           {!collapsed && (
             <span className="font-bold text-xl tracking-tight text-[var(--text-primary)]">CodeVanta</span>
           )}
-        </Link>
+        </button>
       </div>
 
       {/* Navigation */}

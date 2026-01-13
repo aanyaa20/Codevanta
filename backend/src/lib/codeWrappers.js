@@ -21,6 +21,9 @@ function serializeJS(value) {
 export function generateCppWrapper(userCode, functionSignature, testCases) {
   const { functionName, returnType, parameters } = functionSignature;
 
+  // Check if user code contains a class or is standalone
+  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
+  
   // Build parameter list for function call
   const paramList = parameters.map((p) => p.name).join(", ");
 
@@ -31,10 +34,13 @@ export function generateCppWrapper(userCode, functionSignature, testCases) {
       const inputStr = inputs.map((inp) => serializeCppValue(inp)).join(", ");
       const expectedStr = serializeCppValue(tc.expectedOutput);
 
+      // Call function based on whether we have a class or standalone function
+      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
+
       return `
     // Test Case ${idx + 1}
     {
-        auto result = sol.${functionName}(${inputStr});
+        auto result = ${functionCall};
         auto expected = ${expectedStr};
         if (result != expected) {
             cout << "FAILED|${idx}|" << expected << "|";
@@ -46,6 +52,13 @@ export function generateCppWrapper(userCode, functionSignature, testCases) {
     }`;
     })
     .join("\n");
+
+  // If user didn't write a class, wrap their code in a Solution class
+  const wrappedUserCode = hasClass ? userCode : `
+class Solution {
+public:
+${userCode}
+};`;
 
   return `#include <bits/stdc++.h>
 using namespace std;
@@ -67,7 +80,7 @@ void printValue(const vector<T>& vec) {
 }
 
 // USER CODE START
-${userCode}
+${wrappedUserCode}
 // USER CODE END
 
 int main() {
@@ -92,16 +105,22 @@ int main() {
 export function generatePythonWrapper(userCode, functionSignature, testCases) {
   const { functionName } = functionSignature;
 
+  // Check if user code contains a class
+  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
+
   const testCaseCode = testCases
     .map((tc, idx) => {
       const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
       const inputStr = inputs.map((inp) => serializeJS(inp)).join(", ");
       const expectedStr = serializeJS(tc.expectedOutput);
 
+      // Call function based on whether we have a class or standalone
+      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
+
       return `
     # Test Case ${idx + 1}
     try:
-        result = sol.${functionName}(${inputStr})
+        result = ${functionCall}
         expected = ${expectedStr}
         if result != expected:
             print(f"FAILED|${idx}|{expected}|{result}")
@@ -113,15 +132,23 @@ export function generatePythonWrapper(userCode, functionSignature, testCases) {
     })
     .join("\n");
 
+  // If user didn't write a class, wrap their code
+  const wrappedUserCode = hasClass ? userCode : `
+class Solution:
+${userCode.split('\n').map(line => '    ' + line).join('\n')}
+`;
+
+  const setupCode = hasClass ? "sol = Solution()" : "sol = Solution()";
+
   return `import sys
 import json
 
 # USER CODE START
-${userCode}
+${wrappedUserCode}
 # USER CODE END
 
 def main():
-    sol = Solution()
+    ${setupCode}
     passed = 0
     total = ${testCases.length}
     
@@ -143,16 +170,22 @@ if __name__ == "__main__":
 export function generateJavaScriptWrapper(userCode, functionSignature, testCases) {
   const { functionName } = functionSignature;
 
+  // Check if user code contains a class
+  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
+
   const testCaseCode = testCases
     .map((tc, idx) => {
       const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
       const inputStr = inputs.map((inp) => serializeJS(inp)).join(", ");
       const expectedStr = serializeJS(tc.expectedOutput);
 
+      // Call function based on whether we have a class or standalone
+      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
+
       return `
     // Test Case ${idx + 1}
     try {
-        const result = sol.${functionName}(${inputStr});
+        const result = ${functionCall};
         const expected = ${expectedStr};
         if (JSON.stringify(result) !== JSON.stringify(expected)) {
             console.log(\`FAILED|${idx}|\${JSON.stringify(expected)}|\${JSON.stringify(result)}\`);
@@ -166,12 +199,21 @@ export function generateJavaScriptWrapper(userCode, functionSignature, testCases
     })
     .join("\n");
 
-  return `// USER CODE START
+  // If user didn't write a class, wrap their code
+  const wrappedUserCode = hasClass ? userCode : `
+class Solution {
 ${userCode}
+}
+`;
+
+  const setupCode = hasClass ? "const sol = new Solution();" : "const sol = new Solution();";
+
+  return `// USER CODE START
+${wrappedUserCode}
 // USER CODE END
 
 function main() {
-    const sol = new Solution();
+    ${setupCode}
     let passed = 0;
     const total = ${testCases.length};
     

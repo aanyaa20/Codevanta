@@ -37,6 +37,7 @@ function Navbar({ collapsed }) {
   return (
     <>
     <header className="h-16 bg-white border-b border-[var(--border-subtle)] flex items-center justify-end px-6 md:px-8 shadow-sm z-40 relative">
+
       <div className="flex items-center gap-4">
         <button 
           onClick={() => setShowCreateModal(true)}
