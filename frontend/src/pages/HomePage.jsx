@@ -461,7 +461,7 @@ function HomePage() {
         </div>
 
         {/* HERO CONTENT - Constrained */}
-        <div className="relative z-10 w-full min-h-screen flex items-center px-6 lg:px-8 py-4">
+        <div className="relative z-10 w-full flex items-start px-6 lg:px-8 pt-20 pb-4">
           <div className="max-w-7xl mx-auto w-full">
             {/* Mobile: Centered, Desktop: 2-Column Grid */}
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -475,8 +475,8 @@ function HomePage() {
                   transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm mb-8"
                 >
-                  <Sparkles className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-slate-700">Revolutionizing collaborative coding</span>
+<Users className="w-4 h-4 text-slate-700" />
+                  <span className="text-xs font-medium text-slate-700">Revolutionizing collaborative coding</span>
                 </motion.div>
 
                 {/* Headline */}
@@ -486,20 +486,14 @@ function HomePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
                   >
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.15]">
                       <span className="bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
                         Code Together,
                       </span>
-                    </h1>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
-                  >
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-800 tracking-tight leading-[1.1]">
-                      Succeed Together.
+                      <br />
+                      <span className="text-slate-800">
+                        Succeed Together.
+                      </span>
                     </h1>
                   </motion.div>
                 </div>
@@ -509,9 +503,11 @@ function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
-                  className="text-xl md:text-2xl text-slate-600 mb-10 max-w-xl leading-relaxed"
+                  className="text-lg md:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed"
                 >
-                  Real-time collaborative coding with integrated video chat, live code execution, and seamless pair programming.
+                 A unified environment for real-time collaborative coding with integrated video chat, live code execution, and seamless pair programming.
+                 <br />
+One Workspace. One Team. Live Code.
                 </motion.p>
 
                 {/* CTAs */}
@@ -537,7 +533,6 @@ function HomePage() {
                         />
                         <span className="relative flex items-center gap-2">
                           Start Coding Now
-                          <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         </span>
                         
                         {/* Glow Effect */}
@@ -598,10 +593,10 @@ function HomePage() {
               >
                 <motion.div
                   key={currentProblemIndex}
-                  initial={{ rotateY: 90, opacity: 0 }}
-                  animate={{ rotateY: 0, opacity: 1 }}
-                  exit={{ rotateY: -90, opacity: 0 }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  initial={{ scale: 0.8, rotate: -10, opacity: 0 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                  exit={{ scale: 0.8, rotate: 10, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
                   className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg"
                 >
                   {/* Header */}
@@ -665,15 +660,15 @@ function HomePage() {
       </section>
 
       {/* FEATURES SECTION */}
-      <AnimatedSection className="relative py-32 px-6 lg:px-8">
+      <AnimatedSection className="relative py-20 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-14">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-5xl md:text-6xl font-bold text-slate-800 mb-6 tracking-tight"
+              className="text-4xl md:text-5xl font-bold text-slate-800 mb-6 tracking-tight"
             >
               Everything you need to
               <span className="bg-gradient-to-r from-cyan-600 to-teal-500 bg-clip-text text-transparent"> collaborate</span>
@@ -683,7 +678,7 @@ function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-slate-600 max-w-2xl mx-auto"
+              className="text-lg text-slate-600 max-w-2xl mx-auto"
             >
               Powerful features designed for modern development teams
             </motion.p>
@@ -719,13 +714,13 @@ function HomePage() {
                 icon: GitBranch,
                 title: "Session Management",
                 description: "Create, join, and manage coding sessions with full history tracking",
-                gradient: "from-purple-500 to-pink-400",
+                gradient: "from-cyan-400 to-teal-300",
               },
               {
                 icon: Zap,
                 title: "Lightning Fast",
                 description: "Optimized performance with WebSocket connections and efficient rendering",
-                gradient: "from-orange-500 to-amber-400",
+                gradient: "from-cyan-400 to-teal-300",
               },
             ].map((feature, index) => (
               <motion.div
@@ -739,7 +734,7 @@ function HomePage() {
               >
                 <div className="h-full p-8 rounded-3xl backdrop-blur-md bg-white/60 border border-white/80 shadow-lg hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
                   {/* Hover Glow Effect */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 via-teal-300 to-orange-300 opacity-0 group-hover:opacity-[0.12] transition-opacity duration-500" />
                   
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
                     <feature.icon className="w-7 h-7 text-white" />
@@ -754,7 +749,7 @@ function HomePage() {
                   </p>
 
                   {/* Border Glow on Hover */}
-                  <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${feature.gradient} blur-xl -z-10`} />
+                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-[0.15] transition-opacity duration-500 bg-gradient-to-br from-cyan-400 via-teal-300 to-orange-300 blur-2xl -z-10" />
                 </div>
               </motion.div>
             ))}
@@ -763,15 +758,15 @@ function HomePage() {
       </AnimatedSection>
 
       {/* VISUAL/DEMO SECTION */}
-      <AnimatedSection className="relative py-32 px-6 lg:px-8">
+      <AnimatedSection className="relative py-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-5xl md:text-6xl font-bold text-slate-800 mb-6 tracking-tight"
+              className="text-4xl md:text-5xl font-bold text-slate-800 mb-6 tracking-tight"
             >
               See it in <span className="bg-gradient-to-r from-cyan-600 to-teal-500 bg-clip-text text-transparent">action</span>
             </motion.h2>
@@ -863,7 +858,7 @@ function HomePage() {
       </AnimatedSection>
 
       {/* STATS SECTION */}
-      <AnimatedSection className="relative py-32 px-6 lg:px-8">
+      <AnimatedSection className="relative py-20 px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -892,7 +887,7 @@ function HomePage() {
       </AnimatedSection>
 
       {/* FINAL CTA SECTION */}
-      <AnimatedSection className="relative py-32 px-6 lg:px-8">
+      <AnimatedSection className="relative py-20 px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -902,7 +897,7 @@ function HomePage() {
             className="relative rounded-[2.5rem] overflow-hidden"
           >
             {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-teal-500 to-cyan-600">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-orange-500 to-orange-600">
               <motion.div
                 animate={{
                   backgroundPosition: ["0% 0%", "100% 100%"],
@@ -913,23 +908,23 @@ function HomePage() {
                   repeatType: "reverse",
                   ease: "linear",
                 }}
-                className="absolute inset-0 bg-gradient-to-tr from-cyan-400 via-blue-500 to-cyan-600 opacity-70"
+                className="absolute inset-0 bg-gradient-to-tr from-orange-400 via-cyan-500 to-orange-600 opacity-60"
                 style={{ backgroundSize: "200% 200%" }}
               />
             </div>
 
-            {/* Pulse Effect */}
+            {/* Mesh Glow Effect */}
             <motion.div
               animate={{
-                scale: [1, 1.05, 1],
-                opacity: [0.3, 0.5, 0.3],
+                scale: [1, 1.08, 1],
+                opacity: [0.4, 0.6, 0.4],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute inset-0 bg-white/20 blur-3xl"
+              className="absolute inset-0 bg-gradient-to-br from-orange-500/40 via-transparent to-cyan-500/40 blur-3xl"
             />
 
             <div className="relative px-12 py-20 text-center">
@@ -938,7 +933,7 @@ function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight"
+                className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight"
               >
                 Ready to transform your
                 <br />
@@ -950,7 +945,7 @@ function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-xl text-white/90 mb-10 max-w-2xl mx-auto"
+                className="text-lg text-white/90 mb-10 max-w-2xl mx-auto"
               >
                 Join thousands of developers collaborating in real-time
               </motion.p>
