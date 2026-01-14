@@ -15,8 +15,7 @@ import {
   MessageSquare,
   Globe
 } from "lucide-react";
-import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
-import LandingNavbar from "../components/LandingNavbar";
+import { SignInButton, SignedIn, SignedOut, useUser, UserButton } from "@clerk/clerk-react";
 import { AUTH_INTENTS, setAuthIntent } from "../lib/authIntent";
 
 // Animated Counter Component
@@ -200,8 +199,57 @@ function HomePage() {
       <FloatingBlob className="w-80 h-80 bg-teal-400/20 bottom-40 left-1/4" delay={4} />
       <FloatingBlob className="w-96 h-96 bg-green-300/15 bottom-20 right-1/4" delay={6} />
 
-      {/* LANDING NAVBAR - Conditional based on auth */}
-      <LandingNavbar onGetStarted={handleGetStarted} />
+      {/* NAVBAR */}
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="sticky top-0 z-50 backdrop-blur-xl bg-white/40 border-b border-white/60"
+      >
+        <nav className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300 group-hover:scale-105">
+              <Code2 className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
+              CodeVanta
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-4">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal">
+                <motion.button
+                  onClick={handleGetStarted}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-500 to-cyan-600 text-white font-medium text-sm shadow-lg shadow-cyan-500/25 overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative flex items-center gap-2">
+                    Get Started
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </motion.button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "size-9 rounded-full ring-2 ring-cyan-100 shadow-sm hover:ring-cyan-200 transition-all"
+                  }
+                }}
+              />
+            </SignedIn>
+          </div>
+        </nav>
+      </motion.header>
 
       {/* HERO SECTION */}
       <section className="relative w-full min-h-screen overflow-hidden">
