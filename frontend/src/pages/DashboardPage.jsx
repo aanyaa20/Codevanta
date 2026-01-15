@@ -90,7 +90,7 @@ function DashboardPage() {
             </div>
             
             <h1 className="text-3xl font-bold mb-2 text-slate-900">
-              Good morning, {user?.firstName || "Developer"}!
+              Welcome, {user?.firstName || "Developer"}!
             </h1>
             <p className="text-lg text-slate-500 max-w-lg">
               You've completed {completedSessions} sessions so far. Keep the streak alive!

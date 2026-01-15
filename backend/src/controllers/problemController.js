@@ -141,7 +141,14 @@ export const runCode = async (req, res) => {
 
     res.json({
       success: true,
-      ...result,
+      status: result.status,
+      passedCount: result.passedCount,
+      totalCount: result.totalCount,
+      failedTestIndex: result.failedTestIndex,
+      expectedOutput: result.expectedOutput,
+      actualOutput: result.actualOutput,
+      errorMessage: result.errorMessage,
+      testCaseResults: result.testCaseResults || [],
     });
   } catch (error) {
     console.error("Error in runCode:", error);
@@ -228,7 +235,7 @@ export const submitCode = async (req, res) => {
       expectedOutput: result.expectedOutput,
       actualOutput: result.actualOutput,
       errorMessage: result.errorMessage,
-      errorMessage: result.errorMessage,
+      testCaseResults: result.testCaseResults || [],
     });
   } catch (error) {
     console.error("Error in submitCode:", error);

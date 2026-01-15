@@ -44,13 +44,6 @@ function LiveSessionsPage() {
               <div className="text-slate-500 font-medium">Sessions Live Now</div>
             </div>
           </div>
-          
-          <div className="hidden sm:flex flex-col items-end">
-             <span className="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-semibold border border-green-200 animate-pulse flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-green-500"></span>
-               LIVE UPDATES
-             </span>
-          </div>
         </div>
 
         {/* Content */}
