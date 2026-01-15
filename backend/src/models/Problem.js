@@ -40,6 +40,7 @@ const functionSignatureSchema = new mongoose.Schema({
 
 const starterCodeSchema = new mongoose.Schema({
   cpp: String,
+  c: String,
   python: String,
   javascript: String,
   java: String,

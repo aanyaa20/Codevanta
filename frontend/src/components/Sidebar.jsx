@@ -7,7 +7,8 @@ import {
   Settings,
   Code2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  VideoIcon
 } from "lucide-react";
 import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
 
@@ -22,6 +23,7 @@ function Sidebar({ collapsed, setCollapsed }) {
     { path: "/problems", icon: BookOpen, label: "Problems" },
     { path: "/sessions/history", icon: Clock, label: "History" },
     { path: "/sessions/active", icon: Users, label: "Live Sessions" },
+    { path: "/recordings", icon: VideoIcon, label: "Recorded Sessions" },
     { path: "/settings", icon: Settings, label: "Settings" }
   ];
 
