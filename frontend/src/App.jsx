@@ -12,6 +12,7 @@ import SessionPage from "./pages/SessionPage";
 import SettingsPage from "./pages/SettingsPage";
 import LiveSessionsPage from "./pages/LiveSessionsPage";
 import HistoryPage from "./pages/HistoryPage";
+import RecordingsPage from "./pages/RecordingsPage";
 
 function App() {
   const { isSignedIn, isLoaded } = useUser();
@@ -46,6 +47,7 @@ function App() {
         <Route path="/settings" element={isSignedIn ? <SettingsPage /> : <Navigate to={"/"} />} />
         <Route path="/sessions/active" element={isSignedIn ? <LiveSessionsPage /> : <Navigate to={"/"} />} />
         <Route path="/sessions/history" element={isSignedIn ? <HistoryPage /> : <Navigate to={"/"} />} />
+        <Route path="/recordings" element={isSignedIn ? <RecordingsPage /> : <Navigate to={"/"} />} />
       </Routes>
 
       <Toaster toastOptions={{ duration: 3000 }} />

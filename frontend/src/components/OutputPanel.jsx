@@ -9,8 +9,9 @@ function OutputPanel({ output, testResults, isRunning }) {
   const passedCount = data?.passed || data?.passedCount || 0;
   const totalCount = data?.total || data?.totalCount || 0;
   const results = data?.results || [];
-  const errorMessage = data?.errorMessage;
+  const errorMessage = data?.errorMessage || data?.error;
   const runtime = data?.runtime;
+  const simpleOutput = data?.output;
 
   // Find first failed test
   const failedTest = results.find(r => !r.passed);
@@ -85,8 +86,38 @@ function OutputPanel({ output, testResults, isRunning }) {
               </div>
             )}
           </div>
-        ) : output ? (
-          <pre className="text-sm text-slate-700 font-mono whitespace-pre-wrap">{output}</pre>
+        ) : errorMessage ? (
+          <div className="space-y-3">
+            <div className="p-4 bg-red-50 rounded-lg border-2 border-red-500">
+              <div className="flex items-center gap-2 mb-2">
+                <XCircle className="size-6 text-red-600" />
+                <span className="text-lg font-bold text-red-800">Error</span>
+              </div>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <h4 className="text-sm font-semibold text-red-600 mb-2">Error Message:</h4>
+              <pre className="text-xs bg-red-50 p-3 rounded text-red-800 overflow-x-auto whitespace-pre-wrap">{errorMessage}</pre>
+            </div>
+            {simpleOutput && (
+              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-semibold text-slate-700 mb-2">Output:</h4>
+                <pre className="text-xs bg-white p-3 rounded text-slate-800 overflow-x-auto whitespace-pre-wrap">{simpleOutput}</pre>
+              </div>
+            )}
+          </div>
+        ) : simpleOutput ? (
+          <div className="space-y-3">
+            <div className="p-4 bg-green-50 rounded-lg border-2 border-green-500">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-6 text-green-600" />
+                <span className="text-lg font-bold text-green-800">Success</span>
+              </div>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <h4 className="text-sm font-semibold text-slate-700 mb-2">Output:</h4>
+              <pre className="text-sm text-slate-700 font-mono bg-white p-3 rounded overflow-x-auto whitespace-pre-wrap">{simpleOutput}</pre>
+            </div>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full text-slate-400">
             <p className="text-sm">Run your code to see output here</p>

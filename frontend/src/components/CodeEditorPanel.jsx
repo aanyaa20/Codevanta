@@ -4,6 +4,7 @@ import { Loader2Icon, PlayIcon, SendIcon } from "lucide-react";
 const LANGUAGE_CONFIG = {
   javascript: { name: "JavaScript", monacoLang: "javascript" },
   python: { name: "Python", monacoLang: "python" },
+  c: { name: "C", monacoLang: "c" },
   cpp: { name: "C++", monacoLang: "cpp" },
   java: { name: "Java", monacoLang: "java" },
 };

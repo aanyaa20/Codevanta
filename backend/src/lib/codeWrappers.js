@@ -1,87 +1,242 @@
 /**
- * Language-specific code wrapper templates for Online Judge
- * Users write ONLY the solution function
- * These templates inject user code into hidden driver/main code
+ * LeetCode-Style Code Wrapper Generator
+ * Generates complete executable code by wrapping user's solution
+ * 
+ * METHODOLOGY:
+ * 1. User writes ONLY the function/class
+ * 2. We inject hidden main() with test cases
+ * 3. We compile & run the full code
+ * 4. Output is captured and parsed
  */
 
 /**
- * Serialize JavaScript value to string representation
+ * Serialize value to C++ code representation
  */
-function serializeJS(value) {
+function serializeCppValue(value, type = null) {
+  if (value === null || value === undefined) return "NULL";
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return value.toString();
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
+  
+  if (Array.isArray(value)) {
+    // Check if it's array of numbers, strings, etc
+    if (value.length === 0) return "{}";
+    const items = value.map(v => serializeCppValue(v)).join(", ");
+    return `{${items}}`;
+  }
+  
+  if (typeof value === "object") {
+    // For objects, serialize as initializer list or specific structure
+    return JSON.stringify(value);
+  }
+  
+  return value.toString();
+}
+
+/**
+ * Serialize value to Python code representation
+ */
+function serializePythonValue(value) {
+  if (value === null || value === undefined) return "None";
+  if (typeof value === "boolean") return value ? "True" : "False";
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
   return JSON.stringify(value);
 }
 
 /**
+ * Serialize value to Java code representation
+ */
+function serializeJavaValue(value) {
+  if (value === null || value === undefined) return "null";
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return value.toString();
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
+  
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "new int[]{}";
+    // Determine array type based on first element
+    const firstType = typeof value[0];
+    const items = value.map(v => serializeJavaValue(v)).join(", ");
+    
+    if (firstType === "number") {
+      return `new int[]{${items}}`;
+    } else if (firstType === "string") {
+      return `new String[]{${items}}`;
+    }
+    return `new Object[]{${items}}`;
+  }
+  
+  return JSON.stringify(value);
+}
+
+/**
+ * Extract test case parameters from input object
+ */
+function extractTestInputs(input) {
+  if (typeof input !== "object" || input === null) {
+    return [input];
+  }
+  // Input is an object like { nums: [1,2,3], target: 5 }
+  return Object.values(input);
+}
+
+/**
  * Generate C++ wrapper code
- * @param {string} userCode - User's solution function
- * @param {object} functionSignature - {functionName, returnType, parameters}
- * @param {array} testCases - Array of {input, expectedOutput}
- * @returns {string} Complete C++ code with main()
  */
 export function generateCppWrapper(userCode, functionSignature, testCases) {
-  const { functionName, returnType, parameters } = functionSignature;
+  const { functionName, parameters, returnType } = functionSignature;
+  const isVoidReturn = returnType === 'void';
 
-  // Check if user code contains a class or is standalone
-  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
-  
-  // Build parameter list for function call
-  const paramList = parameters.map((p) => p.name).join(", ");
+  // Remove any user-added includes to avoid duplication
+  const cleanUserCode = userCode
+    .replace(/#include\s*<bits\/stdc\+\+\.h>/g, '')
+    .replace(/#include\s*<iostream>/g, '')
+    .replace(/using\s+namespace\s+std;/g, '')
+    .trim();
 
-  // Generate test case execution code
   const testCaseCode = testCases
     .map((tc, idx) => {
-      const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
-      const inputStr = inputs.map((inp) => serializeCppValue(inp)).join(", ");
-      const expectedStr = serializeCppValue(tc.expectedOutput);
-
-      // Call function based on whether we have a class or standalone function
-      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
+      const inputs = extractTestInputs(tc.input);
+      const expected = tc.expectedOutput;
+      const inputStr = JSON.stringify(tc.input).replace(/"/g, '\\"');
+      
+      // Create proper variable declarations for inputs
+      let variableDeclarations = '';
+      let callArgs = '';
+      
+      inputs.forEach((input, i) => {
+        const varName = `input${i}`;
+        if (Array.isArray(input)) {
+          if (input.length > 0 && typeof input[0] === 'string') {
+            const items = input.map(v => `'${v}'`).join(", ");
+            variableDeclarations += `        vector<char> ${varName} = {${items}};\n`;
+          } else if (input.length > 0 && typeof input[0] === 'number') {
+            const items = input.join(", ");
+            variableDeclarations += `        vector<int> ${varName} = {${items}};\n`;
+          } else {
+            variableDeclarations += `        vector<int> ${varName} = {};\n`;
+          }
+        } else if (typeof input === 'string') {
+          variableDeclarations += `        string ${varName} = "${input.replace(/"/g, '\\"')}";\n`;
+        } else if (typeof input === 'number') {
+          variableDeclarations += `        int ${varName} = ${input};\n`;
+        } else if (typeof input === 'boolean') {
+          variableDeclarations += `        bool ${varName} = ${input ? 'true' : 'false'};\n`;
+        }
+        callArgs += (i > 0 ? ', ' : '') + varName;
+      });
+      
+      // Generate type-appropriate comparison
+      let functionCallCode, comparisonCode, resultStr, expectedStrCode;
+      
+      if (isVoidReturn) {
+        // For void functions, they modify the first parameter in-place
+        functionCallCode = `sol.${functionName}(${callArgs});`;
+        const resultVarName = 'input0'; // The modified first parameter
+        
+        if (Array.isArray(expected)) {
+          let expectedVec = '';
+          if (expected.length > 0 && typeof expected[0] === 'string') {
+            const items = expected.map(v => `'${v}'`).join(", ");
+            expectedVec = `vector<char>{${items}}`;
+          } else if (expected.length > 0 && typeof expected[0] === 'number') {
+            const items = expected.join(", ");
+            expectedVec = `vector<int>{${items}}`;
+          } else {
+            expectedVec = `vector<int>{}`;
+          }
+          comparisonCode = `!compareVectors(${resultVarName}, ${expectedVec})`;
+          resultStr = `vecToString(${resultVarName})`;
+          expectedStrCode = `vecToString(${expectedVec})`;
+        } else {
+          comparisonCode = `${resultVarName} != ${serializeCppValue(expected)}`;
+          resultStr = `to_string(${resultVarName})`;
+          expectedStrCode = `"${JSON.stringify(expected).replace(/"/g, '\\"')}"`;
+        }
+      } else {
+        functionCallCode = `auto result = sol.${functionName}(${callArgs});`;
+        
+        if (typeof expected === 'boolean') {
+          comparisonCode = `result != ${expected ? 'true' : 'false'}`;
+          resultStr = `(result ? "true" : "false")`;
+          expectedStrCode = `"${expected}"`;
+        } else if (typeof expected === 'number') {
+          comparisonCode = `result != ${expected}`;
+          resultStr = `to_string(result)`;
+          expectedStrCode = `"${expected}"`;
+        } else if (typeof expected === 'string') {
+          comparisonCode = `result != "${expected.replace(/"/g, '\\"')}"`;
+          resultStr = `result`;
+          expectedStrCode = `"${expected.replace(/"/g, '\\"')}"`;
+        } else if (Array.isArray(expected)) {
+          let expectedVec = '';
+          if (expected.length > 0 && typeof expected[0] === 'string') {
+            const items = expected.map(v => `'${v}'`).join(", ");
+            expectedVec = `vector<char>{${items}}`;
+          } else if (expected.length > 0 && typeof expected[0] === 'number') {
+            const items = expected.join(", ");
+            expectedVec = `vector<int>{${items}}`;
+          } else {
+            expectedVec = `vector<int>{}`;
+          }
+          comparisonCode = `!compareVectors(result, ${expectedVec})`;
+          resultStr = `vecToString(result)`;
+          expectedStrCode = `vecToString(${expectedVec})`;
+        } else {
+          comparisonCode = `result != ${serializeCppValue(expected)}`;
+          resultStr = `to_string(result)`;
+          expectedStrCode = `"${JSON.stringify(expected).replace(/"/g, '\\"')}"`;
+        }
+      }
 
       return `
-    // Test Case ${idx + 1}
+    // Test ${idx + 1}
     {
-        auto result = ${functionCall};
-        auto expected = ${expectedStr};
-        if (result != expected) {
-            cout << "FAILED|${idx}|" << expected << "|";
-            printValue(result);
-            cout << endl;
+${variableDeclarations}        ${functionCallCode}
+        if (${comparisonCode}) {
+            cout << "TEST|${idx}|FAIL|${inputStr}|" << ${expectedStrCode} << "|" << ${resultStr} << endl;
+            cout << "FAIL|${idx}|" << ${expectedStrCode} << "|" << ${resultStr} << endl;
             return 0;
         }
+        cout << "TEST|${idx}|PASS|${inputStr}|" << ${expectedStrCode} << "|" << ${resultStr} << endl;
         passed++;
     }`;
     })
     .join("\n");
 
-  // If user didn't write a class, wrap their code in a Solution class
-  const wrappedUserCode = hasClass ? userCode : `
-class Solution {
-public:
-${userCode}
-};`;
-
   return `#include <bits/stdc++.h>
 using namespace std;
 
-// Helper function to print values
+// Vector comparison helper
 template<typename T>
-void printValue(const T& val) {
-    cout << val;
-}
-
-template<typename T>
-void printValue(const vector<T>& vec) {
-    cout << "[";
-    for(int i = 0; i < vec.size(); i++) {
-        if(i > 0) cout << ",";
-        printValue(vec[i]);
+bool compareVectors(const vector<T>& a, const vector<T>& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); i++) {
+        if (a[i] != b[i]) return false;
     }
-    cout << "]";
+    return true;
 }
 
-// USER CODE START
-${wrappedUserCode}
-// USER CODE END
+// Vector to string helper
+template<typename T>
+string vecToString(const vector<T>& vec) {
+    ostringstream oss;
+    oss << "[";
+    for(size_t i = 0; i < vec.size(); i++) {
+        if(i > 0) oss << ",";
+        if (typeid(T) == typeid(char)) {
+            oss << "'" << vec[i] << "'";
+        } else {
+            oss << vec[i];
+        }
+    }
+    oss << "]";
+    return oss.str();
+}
+
+// ===== USER CODE =====
+${cleanUserCode}
+// ===== END USER CODE =====
 
 int main() {
     Solution sol;
@@ -90,192 +245,183 @@ int main() {
     
     ${testCaseCode}
     
-    cout << "PASSED|" << passed << "|" << total << endl;
+    cout << "PASS|" << passed << "|" << total << endl;
+    return 0;
+}`;
+}
+
+/**
+ * Generate C wrapper code
+ */
+export function generateCWrapper(userCode, functionSignature, testCases) {
+  const { functionName } = functionSignature;
+
+  // Remove any user-added includes to avoid duplication
+  const cleanUserCode = userCode
+    .replace(/#include\s*<stdio\.h>/g, '')
+    .replace(/#include\s*<stdlib\.h>/g, '')
+    .replace(/#include\s*<string\.h>/g, '')
+    .replace(/#include\s*<stdbool\.h>/g, '')
+    .trim();
+
+  const testCaseCode = testCases
+    .map((tc, idx) => {
+      const inputs = extractTestInputs(tc.input);
+      const args = inputs.map(inp => serializeCppValue(inp)).join(", ");
+      const expected = serializeCppValue(tc.expectedOutput);
+
+      return `
+    // Test ${idx + 1}
+    {
+        auto result = ${functionName}(${args});
+        if (result != ${expected}) {
+            printf("FAIL|${idx}|%d|%d\\n", ${expected}, result);
+            return 0;
+        }
+        passed++;
+    }`;
+    })
+    .join("\n");
+
+  return `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+// ===== USER CODE =====
+${cleanUserCode}
+// ===== END USER CODE =====
+
+int main() {
+    int passed = 0;
+    int total = ${testCases.length};
+    
+    ${testCaseCode}
+    
+    printf("PASS|%d|%d\\n", passed, total);
     return 0;
 }`;
 }
 
 /**
  * Generate Python wrapper code
- * @param {string} userCode - User's solution function
- * @param {object} functionSignature - {functionName, returnType, parameters}
- * @param {array} testCases - Array of {input, expectedOutput}
- * @returns {string} Complete Python code with driver
  */
 export function generatePythonWrapper(userCode, functionSignature, testCases) {
   const { functionName } = functionSignature;
 
-  // Check if user code contains a class
-  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
+  // Remove any duplicate imports
+  const cleanUserCode = userCode
+    .replace(/^import\s+json\s*$/gm, '')
+    .replace(/^import\s+sys\s*$/gm, '')
+    .replace(/^from\s+typing\s+import.*/gm, '')
+    .trim();
 
   const testCaseCode = testCases
     .map((tc, idx) => {
-      const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
-      const inputStr = inputs.map((inp) => serializeJS(inp)).join(", ");
-      const expectedStr = serializeJS(tc.expectedOutput);
-
-      // Call function based on whether we have a class or standalone
-      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
+      const inputs = extractTestInputs(tc.input);
+      const args = inputs.map(inp => serializePythonValue(inp)).join(", ");
+      const expected = serializePythonValue(tc.expectedOutput);
 
       return `
-    # Test Case ${idx + 1}
-    try:
-        result = ${functionCall}
-        expected = ${expectedStr}
-        if result != expected:
-            print(f"FAILED|${idx}|{expected}|{result}")
-            return
-        passed += 1
-    except Exception as e:
-        print(f"ERROR|${idx}|{str(e)}")
-        return`;
+    # Test ${idx + 1}
+    result = sol.${functionName}(${args})
+    expected = ${expected}
+    if result != expected:
+        print(f"FAIL|${idx}|{expected}|{result}")
+        return
+    passed += 1`;
     })
     .join("\n");
 
-  // If user didn't write a class, wrap their code
-  const wrappedUserCode = hasClass ? userCode : `
-class Solution:
-${userCode.split('\n').map(line => '    ' + line).join('\n')}
-`;
+  return `import json
+import sys
+from typing import List, Optional
 
-  const setupCode = hasClass ? "sol = Solution()" : "sol = Solution()";
-
-  return `import sys
-import json
-
-# USER CODE START
-${wrappedUserCode}
-# USER CODE END
+# ===== USER CODE =====
+${cleanUserCode}
+# ===== END USER CODE =====
 
 def main():
-    ${setupCode}
+    sol = Solution()
     passed = 0
     total = ${testCases.length}
     
     ${testCaseCode}
     
-    print(f"PASSED|{passed}|{total}")
+    print(f"PASS|{passed}|{total}")
 
 if __name__ == "__main__":
     main()`;
 }
 
 /**
- * Generate JavaScript wrapper code
- * @param {string} userCode - User's solution function
- * @param {object} functionSignature - {functionName, returnType, parameters}
- * @param {array} testCases - Array of {input, expectedOutput}
- * @returns {string} Complete JavaScript code with runner
- */
-export function generateJavaScriptWrapper(userCode, functionSignature, testCases) {
-  const { functionName } = functionSignature;
-
-  // Check if user code contains a class
-  const hasClass = userCode.includes('class Solution') || userCode.includes('class solution');
-
-  const testCaseCode = testCases
-    .map((tc, idx) => {
-      const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
-      const inputStr = inputs.map((inp) => serializeJS(inp)).join(", ");
-      const expectedStr = serializeJS(tc.expectedOutput);
-
-      // Call function based on whether we have a class or standalone
-      const functionCall = hasClass ? `sol.${functionName}(${inputStr})` : `${functionName}(${inputStr})`;
-
-      return `
-    // Test Case ${idx + 1}
-    try {
-        const result = ${functionCall};
-        const expected = ${expectedStr};
-        if (JSON.stringify(result) !== JSON.stringify(expected)) {
-            console.log(\`FAILED|${idx}|\${JSON.stringify(expected)}|\${JSON.stringify(result)}\`);
-            return;
-        }
-        passed++;
-    } catch (e) {
-        console.log(\`ERROR|${idx}|\${e.message}\`);
-        return;
-    }`;
-    })
-    .join("\n");
-
-  // If user didn't write a class, wrap their code
-  const wrappedUserCode = hasClass ? userCode : `
-class Solution {
-${userCode}
-}
-`;
-
-  const setupCode = hasClass ? "const sol = new Solution();" : "const sol = new Solution();";
-
-  return `// USER CODE START
-${wrappedUserCode}
-// USER CODE END
-
-function main() {
-    ${setupCode}
-    let passed = 0;
-    const total = ${testCases.length};
-    
-    ${testCaseCode}
-    
-    console.log(\`PASSED|\${passed}|\${total}\`);
-}
-
-main();`;
-}
-
-/**
  * Generate Java wrapper code
- * @param {string} userCode - User's solution function
- * @param {object} functionSignature - {functionName, returnType, parameters}
- * @param {array} testCases - Array of {input, expectedOutput}
- * @returns {string} Complete Java code with main()
  */
 export function generateJavaWrapper(userCode, functionSignature, testCases) {
   const { functionName } = functionSignature;
 
+  // Remove any duplicate imports
+  const cleanUserCode = userCode
+    .replace(/^import\s+java\.util\.\*;$/gm, '')
+    .replace(/^import\s+java\.util\.stream\.\*;$/gm, '')
+    .trim();
+
   const testCaseCode = testCases
     .map((tc, idx) => {
-      const inputs = Array.isArray(tc.input) ? tc.input : [tc.input];
-      const inputStr = inputs.map((inp) => serializeJavaValue(inp)).join(", ");
-      const expectedStr = serializeJavaValue(tc.expectedOutput);
+      const inputs = extractTestInputs(tc.input);
+      const args = inputs.map(inp => serializeJavaValue(inp)).join(", ");
+      const expected = serializeJavaValue(tc.expectedOutput);
 
       return `
-        // Test Case ${idx + 1}
-        try {
-            var result = sol.${functionName}(${inputStr});
-            var expected = ${expectedStr};
-            if (!compareValues(result, expected)) {
-                System.out.println("FAILED|${idx}|" + expected + "|" + result);
+        // Test ${idx + 1}
+        {
+            var result = sol.${functionName}(${args});
+            var expected = ${expected};
+            if (!compareResults(result, expected)) {
+                System.out.println("FAIL|${idx}|" + stringify(expected) + "|" + stringify(result));
                 return;
             }
             passed++;
-        } catch (Exception e) {
-            System.out.println("ERROR|${idx}|" + e.getMessage());
-            return;
         }`;
     })
     .join("\n");
 
   return `import java.util.*;
+import java.util.stream.*;
 
-// USER CODE START
-${userCode}
-// USER CODE END
+// ===== USER CODE =====
+${cleanUserCode}
+// ===== END USER CODE =====
 
-public class Main {
-    private static boolean compareValues(Object a, Object b) {
+class Main {
+    static <T> boolean compareResults(T a, T b) {
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
         
         if (a instanceof int[] && b instanceof int[]) {
             return Arrays.equals((int[])a, (int[])b);
         }
+        if (a instanceof String[] && b instanceof String[]) {
+            return Arrays.equals((String[])a, (String[])b);
+        }
         if (a instanceof List && b instanceof List) {
             return a.equals(b);
         }
+        
         return a.equals(b);
+    }
+    
+    static <T> String stringify(T obj) {
+        if (obj instanceof int[]) {
+            return Arrays.toString((int[])obj);
+        }
+        if (obj instanceof String[]) {
+            return Arrays.toString((String[])obj);
+        }
+        if (obj instanceof List) {
+            return obj.toString();
+        }
+        return String.valueOf(obj);
     }
     
     public static void main(String[] args) {
@@ -285,148 +431,164 @@ public class Main {
         
         ${testCaseCode}
         
-        System.out.println("PASSED|" + passed + "|" + total);
+        System.out.println("PASS|" + passed + "|" + total);
     }
 }`;
 }
 
 /**
- * Helper function to serialize C++ values
+ * Generate JavaScript wrapper code
  */
-function serializeCppValue(value) {
-  if (Array.isArray(value)) {
-    const elements = value.map((v) => serializeCppValue(v)).join(", ");
-    // Detect type from first element
-    if (value.length > 0) {
-      if (typeof value[0] === "number") {
-        return `vector<int>{${elements}}`;
-      } else if (typeof value[0] === "string") {
-        return `vector<string>{${elements}}`;
-      } else if (Array.isArray(value[0])) {
-        return `vector<vector<int>>{${elements}}`;
-      }
+export function generateJavaScriptWrapper(userCode, functionSignature, testCases) {
+  const { functionName } = functionSignature;
+
+  const testCaseCode = testCases
+    .map((tc, idx) => {
+      const inputs = extractTestInputs(tc.input);
+      const args = inputs.map(inp => JSON.stringify(inp)).join(", ");
+      const expected = JSON.stringify(tc.expectedOutput);
+
+      return `
+    // Test ${idx + 1}
+    {
+        const result = ${functionName}(${args});
+        const expected = ${expected};
+        if (!deepEqual(result, expected)) {
+            console.log(\`FAIL|${idx}|\${JSON.stringify(expected)}|\${JSON.stringify(result)}\`);
+            return;
+        }
+        passed++;
+    }`;
+    })
+    .join("\n");
+
+  return `// Deep equality check
+function deepEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (typeof a !== typeof b) return false;
+    
+    if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        return a.every((val, idx) => deepEqual(val, b[idx]));
     }
-    return `vector<int>{${elements}}`;
-  }
-  if (typeof value === "string") {
-    return `"${value}"`;
-  }
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-  return String(value);
+    
+    if (typeof a === 'object' && typeof b === 'object') {
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+        if (keysA.length !== keysB.length) return false;
+        return keysA.every(key => deepEqual(a[key], b[key]));
+    }
+    
+    return false;
+}
+
+// ===== USER CODE =====
+${userCode}
+// ===== END USER CODE =====
+
+(function main() {
+    let passed = 0;
+    const total = ${testCases.length};
+    
+    ${testCaseCode}
+    
+    console.log(\`PASS|\${passed}|\${total}\`);
+})();`;
 }
 
 /**
- * Helper function to serialize Java values
- */
-function serializeJavaValue(value) {
-  if (Array.isArray(value)) {
-    const elements = value.map((v) => serializeJavaValue(v)).join(", ");
-    if (value.length > 0 && Array.isArray(value[0])) {
-      // 2D array
-      return `new int[][]{{${elements}}}`;
-    }
-    return `new int[]{${elements}}`;
-  }
-  if (typeof value === "string") {
-    return `"${value}"`;
-  }
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-  return String(value);
-}
-
-/**
- * Main wrapper generation function
- * @param {string} language - Programming language
- * @param {string} userCode - User's solution code
- * @param {object} functionSignature - Function metadata
- * @param {array} testCases - Test cases to inject
- * @returns {string} Complete wrapped code
+ * Main wrapper generator - routes to language-specific generator
  */
 export function generateCodeWrapper(language, userCode, functionSignature, testCases) {
   switch (language) {
     case "cpp":
       return generateCppWrapper(userCode, functionSignature, testCases);
+    case "c":
+      return generateCWrapper(userCode, functionSignature, testCases);
     case "python":
       return generatePythonWrapper(userCode, functionSignature, testCases);
-    case "javascript":
-      return generateJavaScriptWrapper(userCode, functionSignature, testCases);
     case "java":
       return generateJavaWrapper(userCode, functionSignature, testCases);
+    case "javascript":
+      return generateJavaScriptWrapper(userCode, functionSignature, testCases);
     default:
       throw new Error(`Unsupported language: ${language}`);
   }
 }
 
 /**
- * Parse execution output from wrapped code
- * @param {string} output - stdout from execution
- * @returns {object} Parsed result
+ * Parse execution output to determine verdict
  */
-export function parseExecutionOutput(output) {
-  const lines = output.trim().split("\n");
-  const lastLine = lines[lines.length - 1];
+export function parseExecutionOutput(stdout, testCases) {
+  const lines = stdout.trim().split("\n");
+  const lastLine = lines[lines.length - 1] || "";
 
-  if (lastLine.startsWith("PASSED|")) {
+  // Extract individual test case results from TEST| lines
+  const testCaseResults = [];
+  for (const line of lines) {
+    if (line.startsWith("TEST|")) {
+      const parts = line.split("|");
+      const idx = parseInt(parts[1]);
+      const status = parts[2]; // PASS or FAIL
+      const input = parts[3];
+      const expected = parts[4];
+      const actual = parts[5];
+
+      testCaseResults.push({
+        passed: status === "PASS",
+        input: input,
+        expected: expected,
+        actual: actual
+      });
+    }
+  }
+
+  // Format: "PASS|5|5" or "FAIL|2|expected|actual"
+  if (lastLine.startsWith("PASS|")) {
     const parts = lastLine.split("|");
     const passed = parseInt(parts[1]);
     const total = parseInt(parts[2]);
 
     return {
-      status: passed === total ? "Accepted" : "Wrong Answer",
+      status: "Accepted",
       passedCount: passed,
       totalCount: total,
       failedTestIndex: null,
       expectedOutput: null,
       actualOutput: null,
       errorMessage: null,
+      testCaseResults: testCaseResults,
     };
   }
 
-  if (lastLine.startsWith("FAILED|")) {
+  if (lastLine.startsWith("FAIL|")) {
     const parts = lastLine.split("|");
-    const failedIndex = parseInt(parts[1]);
+    const failedIdx = parseInt(parts[1]);
     const expected = parts[2];
     const actual = parts[3];
 
     return {
       status: "Wrong Answer",
-      passedCount: failedIndex,
-      totalCount: null,
-      failedTestIndex: failedIndex,
+      passedCount: failedIdx,
+      totalCount: testCases ? testCases.length : -1,
+      failedTestIndex: failedIdx,
       expectedOutput: expected,
       actualOutput: actual,
-      errorMessage: null,
+      errorMessage: `Test case ${failedIdx + 1} failed`,
+      testCaseResults: testCaseResults,
     };
   }
 
-  if (lastLine.startsWith("ERROR|")) {
-    const parts = lastLine.split("|");
-    const failedIndex = parseInt(parts[1]);
-    const errorMsg = parts[2];
-
-    return {
-      status: "Runtime Error",
-      passedCount: failedIndex,
-      totalCount: null,
-      failedTestIndex: failedIndex,
-      expectedOutput: null,
-      actualOutput: null,
-      errorMessage: errorMsg,
-    };
-  }
-
-  // Couldn't parse - likely compilation error or timeout
+  // Unknown output format
   return {
-    status: output.includes("timeout") ? "Time Limit Exceeded" : "Compilation Error",
+    status: "Runtime Error",
     passedCount: 0,
-    totalCount: null,
+    totalCount: testCases ? testCases.length : -1,
     failedTestIndex: 0,
     expectedOutput: null,
     actualOutput: null,
-    errorMessage: output,
+    errorMessage: "Unexpected output format",
+    testCaseResults: testCaseResults,
   };
 }

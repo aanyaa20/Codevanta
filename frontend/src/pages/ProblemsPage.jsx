@@ -16,9 +16,32 @@ function ProblemsPage() {
     hard: 0,
   });
 
+  // Fetch total stats once on mount (independent of filters)
+  useEffect(() => {
+    fetchTotalStats();
+  }, []);
+
+  // Fetch filtered problems when filter changes
   useEffect(() => {
     fetchProblems();
   }, [filter]);
+
+  const fetchTotalStats = async () => {
+    try {
+      // Fetch all problems without filters to get true totals
+      const response = await axiosInstance.get("/problems");
+      const allProblems = response.data.problems || [];
+
+      setStats({
+        total: allProblems.length,
+        easy: allProblems.filter((p) => p.difficulty === "Easy").length,
+        medium: allProblems.filter((p) => p.difficulty === "Medium").length,
+        hard: allProblems.filter((p) => p.difficulty === "Hard").length,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
 
   const fetchProblems = async () => {
     try {
@@ -30,14 +53,6 @@ function ProblemsPage() {
       const response = await axiosInstance.get("/problems", { params });
       const fetchedProblems = response.data.problems || [];
       setProblems(fetchedProblems);
-
-      // Calculate stats
-      const total = fetchedProblems.length;
-      const easy = fetchedProblems.filter((p) => p.difficulty === "Easy").length;
-      const medium = fetchedProblems.filter((p) => p.difficulty === "Medium").length;
-      const hard = fetchedProblems.filter((p) => p.difficulty === "Hard").length;
-
-      setStats({ total, easy, medium, hard });
     } catch (error) {
       console.error("Error fetching problems:", error);
     } finally {
@@ -66,13 +81,17 @@ function ProblemsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card p-5 group hover:border-indigo-500/30 transition-colors bg-white">
+        <div className="card p-5 group transition-colors bg-white border-2 border-slate-200">
           <div className="text-sm text-slate-500 font-medium mb-1">Total Problems</div>
           <div className="text-3xl font-bold text-slate-900">{stats.total}</div>
         </div>
 
         <div
-          className="card p-5 group hover:border-green-500/30 transition-colors bg-white cursor-pointer"
+          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+            filter.difficulty === "Easy"
+              ? "border-green-500 bg-green-50"
+              : "border-transparent hover:border-green-500/30"
+          }`}
           onClick={() => handleDifficultyFilter("Easy")}
         >
           <div className="text-sm text-slate-500 font-medium mb-1">Easy</div>
@@ -80,7 +99,11 @@ function ProblemsPage() {
         </div>
 
         <div
-          className="card p-5 group hover:border-yellow-500/30 transition-colors bg-white cursor-pointer"
+          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+            filter.difficulty === "Medium"
+              ? "border-yellow-500 bg-yellow-50"
+              : "border-transparent hover:border-yellow-500/30"
+          }`}
           onClick={() => handleDifficultyFilter("Medium")}
         >
           <div className="text-sm text-slate-500 font-medium mb-1">Medium</div>
@@ -88,7 +111,11 @@ function ProblemsPage() {
         </div>
 
         <div
-          className="card p-5 group hover:border-red-500/30 transition-colors bg-white cursor-pointer"
+          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+            filter.difficulty === "Hard"
+              ? "border-red-500 bg-red-50"
+              : "border-transparent hover:border-red-500/30"
+          }`}
           onClick={() => handleDifficultyFilter("Hard")}
         >
           <div className="text-sm text-slate-500 font-medium mb-1">Hard</div>

@@ -1,5 +1,6 @@
-import { Code2, Loader2, Plus, X } from "lucide-react";
-import { PROBLEMS } from "../data/problems";
+import { Code2, Loader2, Plus, X, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import axiosInstance from "../lib/axios";
 
 function CreateSessionModal({
   isOpen,
@@ -9,7 +10,58 @@ function CreateSessionModal({
   onCreateRoom,
   isCreating,
 }) {
-  const problems = Object.values(PROBLEMS);
+  const [allProblems, setAllProblems] = useState([]);
+  const [displayedProblems, setDisplayedProblems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Fetch all problems and select random 5-6
+  useEffect(() => {
+    if (isOpen) {
+      fetchProblems();
+    }
+  }, [isOpen]);
+
+  const fetchProblems = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get("/problems");
+      const problems = response.data.problems || [];
+      setAllProblems(problems);
+      
+      // Select random 5-6 problems
+      const randomCount = Math.min(6, problems.length);
+      const randomProblems = problems
+        .sort(() => Math.random() - 0.5)
+        .slice(0, randomCount);
+      setDisplayedProblems(randomProblems);
+    } catch (error) {
+      console.error("Error fetching problems:", error);
+      setDisplayedProblems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter problems based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      // Show random problems when no search
+      const randomCount = Math.min(6, allProblems.length);
+      const randomProblems = allProblems
+        .sort(() => Math.random() - 0.5)
+        .slice(0, randomCount);
+      setDisplayedProblems(randomProblems);
+    } else {
+      // Search and show matching problems
+      const filtered = allProblems.filter((p) =>
+        p.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setDisplayedProblems(filtered);
+    }
+  }, [searchQuery, allProblems]);
+
+  const problems = displayedProblems;
 
   if (!isOpen) return null;
 
@@ -36,7 +88,27 @@ function CreateSessionModal({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-6">
+          {/* Search Bar */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">
+              Search Problems
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by problem name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all shadow-sm"
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+            </div>
+            <p className="text-xs text-slate-500">
+              {searchQuery ? `Found ${problems.length} problem(s)` : `Showing ${problems.length} random problems`}
+            </p>
+          </div>
+
           {/* Problem Selection */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-slate-700">
@@ -45,19 +117,22 @@ function CreateSessionModal({
 
             <div className="relative">
               <select
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 appearance-none focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all cursor-pointer shadow-sm"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 appearance-none focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 value={roomConfig.problem}
+                disabled={loading || problems.length === 0}
                 onChange={(e) => {
                   const selectedProblem = problems.find((p) => p.title === e.target.value);
                   setRoomConfig({
-                    difficulty: selectedProblem.difficulty,
+                    difficulty: selectedProblem?.difficulty || "",
                     problem: e.target.value,
                   });
                 }}
               >
-                <option value="" disabled>Choose a coding challenge...</option>
+                <option value="" disabled>
+                  {loading ? "Loading problems..." : problems.length === 0 ? "No problems found" : "Choose a coding challenge..."}
+                </option>
                 {problems.map((problem) => (
-                  <option key={problem.id} value={problem.title}>
+                  <option key={problem._id} value={problem.title}>
                     {problem.title} • {problem.difficulty}
                   </option>
                 ))}
