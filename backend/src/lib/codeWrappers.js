@@ -106,7 +106,14 @@ export function generateCppWrapper(userCode, functionSignature, testCases) {
       
       inputs.forEach((input, i) => {
         const varName = `input${i}`;
-        if (Array.isArray(input)) {
+        const paramType = parameters[i]?.type || '';
+        
+        // Check if this parameter is a ListNode type
+        if (paramType === 'ListNode' && Array.isArray(input)) {
+          // Convert array to linked list
+          const items = input.join(", ");
+          variableDeclarations += `        ListNode* ${varName} = buildList({${items}});\n`;
+        } else if (Array.isArray(input)) {
           if (input.length > 0 && typeof input[0] === 'string') {
             const items = input.map(v => `'${v}'`).join(", ");
             variableDeclarations += `        vector<char> ${varName} = {${items}};\n`;
@@ -156,7 +163,20 @@ export function generateCppWrapper(userCode, functionSignature, testCases) {
       } else {
         functionCallCode = `auto result = sol.${functionName}(${callArgs});`;
         
-        if (typeof expected === 'boolean') {
+        // Check if return type is ListNode
+        if (returnType === 'ListNode' || returnType === 'ListNode*') {
+          // Convert ListNode result to vector for comparison
+          let expectedVec = '';
+          if (Array.isArray(expected)) {
+            const items = expected.join(", ");
+            expectedVec = `vector<int>{${items}}`;
+          } else {
+            expectedVec = `vector<int>{}`;
+          }
+          comparisonCode = `!compareVectors(listToVector(result), ${expectedVec})`;
+          resultStr = `vecToString(listToVector(result))`;
+          expectedStrCode = `vecToString(${expectedVec})`;
+        } else if (typeof expected === 'boolean') {
           comparisonCode = `result != ${expected ? 'true' : 'false'}`;
           resultStr = `(result ? "true" : "false")`;
           expectedStrCode = `"${expected}"`;
@@ -207,6 +227,25 @@ ${variableDeclarations}        ${functionCallCode}
   return `#include <bits/stdc++.h>
 using namespace std;
 
+// ListNode definition for linked list problems
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+// TreeNode definition for tree problems
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
 // Vector comparison helper
 template<typename T>
 bool compareVectors(const vector<T>& a, const vector<T>& b) {
@@ -232,6 +271,28 @@ string vecToString(const vector<T>& vec) {
     }
     oss << "]";
     return oss.str();
+}
+
+// Helper to build linked list from vector
+ListNode* buildList(const vector<int>& values) {
+    if (values.empty()) return nullptr;
+    ListNode* head = new ListNode(values[0]);
+    ListNode* current = head;
+    for (size_t i = 1; i < values.size(); i++) {
+        current->next = new ListNode(values[i]);
+        current = current->next;
+    }
+    return head;
+}
+
+// Helper to convert linked list to vector
+vector<int> listToVector(ListNode* head) {
+    vector<int> result;
+    while (head) {
+        result.push_back(head->val);
+        head = head->next;
+    }
+    return result;
 }
 
 // ===== USER CODE =====
