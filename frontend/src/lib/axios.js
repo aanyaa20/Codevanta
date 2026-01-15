@@ -7,4 +7,10 @@ const axiosInstance = axios.create({
   withCredentials: true, // by adding this field browser will send the cookies to server automatically, on every single req
 });
 
+// Add request interceptor for debugging
+axiosInstance.interceptors.request.use((config) => {
+  console.log("🚀 Request:", config.method?.toUpperCase(), config.baseURL + config.url);
+  return config;
+});
+
 export default axiosInstance;
