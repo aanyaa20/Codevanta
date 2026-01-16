@@ -31,24 +31,24 @@
 -------------------------- */
 @layer base {
   :root {
-    /* Light Theme */
-    --bg-primary: #F8FAFC;
+    /* Light Theme - Teal/Cyan Landing Page Style */
+    --bg-primary: linear-gradient(135deg, #e0f2fe 0%, #f0fdfa 50%, #ecfeff 100%);
     --bg-secondary: #FFFFFF;
-    --bg-tertiary: #F1F5F9;
+    --bg-tertiary: #f0fdfa;
 
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
-    --text-tertiary: #94A3B8;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
 
-    --accent-primary: #F97316;
-    --accent-hover: #EA580C;
-    --accent-subtle: #FFF7ED;
+    --accent-primary: #06b6d4;
+    --accent-hover: #0891b2;
+    --accent-subtle: #ecfeff;
 
-    --border-subtle: #E2E8F0;
-    --border-highlight: #CBD5E1;
+    --border-subtle: #e2e8f0;
+    --border-highlight: #cbd5e1;
 
-    --shadow-soft: 0 1px 3px rgb(0 0 0 / 0.1);
-    --shadow-card: 0 4px 6px rgb(0 0 0 / 0.1);
+    --shadow-soft: 0 1px 3px rgb(6 182 212 / 0.1);
+    --shadow-card: 0 4px 12px rgb(6 182 212 / 0.08);
   }
 
   [data-theme="dark"] {
@@ -72,10 +72,10 @@
   }
 
   body {
-    @apply bg-[var(--bg-primary)]
-           text-[var(--text-primary)]
-           antialiased;
+    @apply text-[var(--text-primary)] antialiased;
     font-family: var(--font-display);
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0fdfa 50%, #ecfeff 100%);
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -198,6 +198,104 @@
 }
 
 /* -------------------------
+   MESH GRADIENT BACKGROUND
+-------------------------- */
+.dashboard-mesh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    #cffafe 0%, 
+    #e0f2fe 20%, 
+    #fef3c7 40%, 
+    #dbeafe 60%, 
+    #e0f2fe 80%, 
+    #ccfbf1 100%
+  );
+}
+
+.dashboard-mesh-bg::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(14, 165, 233, 0.2) 40%, transparent 70%);
+  filter: blur(100px);
+  animation: meshFloat1 18s ease-in-out infinite alternate;
+}
+
+.dashboard-mesh-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 65%;
+  height: 65%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(6, 182, 212, 0.2) 40%, transparent 70%);
+  filter: blur(110px);
+  animation: meshFloat2 20s ease-in-out infinite alternate-reverse;
+}
+
+.dashboard-mesh-glow-1 {
+  position: absolute;
+  top: 30%;
+  right: 20%;
+  width: 55%;
+  height: 55%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, rgba(34, 211, 238, 0.15) 35%, transparent 65%);
+  filter: blur(120px);
+  animation: meshFloat3 22s ease-in-out infinite alternate;
+}
+
+.dashboard-mesh-glow-2 {
+  position: absolute;
+  bottom: 20%;
+  left: 15%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(14, 165, 233, 0.12) 35%, transparent 65%);
+  filter: blur(130px);
+  animation: meshFloat4 24s ease-in-out infinite alternate-reverse;
+}
+
+.dashboard-mesh-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+  mix-blend-mode: overlay;
+}
+
+@keyframes meshFloat1 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  50% { transform: translate(10%, 8%) scale(1.15); opacity: 0.5; }
+  100% { transform: translate(20%, 15%) scale(1.2); opacity: 0.4; }
+}
+
+@keyframes meshFloat2 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+  50% { transform: translate(-8%, -10%) scale(1.12); opacity: 0.45; }
+  100% { transform: translate(-15%, -18%) scale(1.18); opacity: 0.35; }
+}
+
+@keyframes meshFloat3 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.3; }
+  50% { transform: translate(-10%, 12%) scale(1.1) rotate(5deg); opacity: 0.4; }
+  100% { transform: translate(-18%, 20%) scale(1.15) rotate(10deg); opacity: 0.3; }
+}
+
+@keyframes meshFloat4 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.25; }
+  50% { transform: translate(12%, -8%) scale(1.14) rotate(-5deg); opacity: 0.35; }
+  100% { transform: translate(22%, -15%) scale(1.2) rotate(-10deg); opacity: 0.25; }
+}
+
+/* -------------------------
    ANIMATIONS
 -------------------------- */
 @keyframes float {
@@ -208,4 +306,33 @@
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* -------------------------
+   GLASSMORPHISM EFFECTS
+-------------------------- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.12), 
+              0 2px 8px 0 rgba(6, 182, 212, 0.06) !important;
+}
+
+.glass-card-strong {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(16px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.15), 
+              0 4px 12px 0 rgba(14, 165, 233, 0.08) !important;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.18), 
+              0 4px 12px 0 rgba(6, 182, 212, 0.1) !important;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }

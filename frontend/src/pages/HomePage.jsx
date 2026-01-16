@@ -208,9 +208,11 @@ function HomePage() {
       >
         <nav className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300 group-hover:scale-105">
-              <Code2 className="w-6 h-6 text-white" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="CodeVanta Logo" 
+              className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+            />
             <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
               CodeVanta
             </span>
@@ -218,11 +220,7 @@ function HomePage() {
 
           <div className="flex items-center gap-4">
             <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
+              
               <SignInButton mode="modal">
                 <motion.button
                   onClick={handleGetStarted}
@@ -701,7 +699,7 @@ One Workspace. One Team. Live Code.
               {
                 icon: Terminal,
                 title: "Live Code Execution",
-                description: "Run code in 40+ languages instantly with Piston API integration",
+                description: "Run code in 4+ languages instantly with Piston API integration",
                 gradient: "from-cyan-500 to-teal-400",
               },
               {
@@ -862,9 +860,9 @@ One Workspace. One Team. Live Code.
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { number: 40, suffix: "+", label: "Programming Languages" },
-              { number: 1000, suffix: "+", label: "Active Users" },
-              { number: 99, suffix: "%", label: "Uptime" },
+              { number: 4, suffix: "+", label: "Programming Languages" },
+              { number: 50, suffix: "+", label: "Active Users" },
+              { number: 95, suffix: "%", label: "Uptime" },
             ].map((stat, index) => (
               <motion.div
                 key={index}

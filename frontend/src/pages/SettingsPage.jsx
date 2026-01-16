@@ -29,7 +29,7 @@ function SettingsPage() {
   const [alternateEmail, setAlternateEmail] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
     
     if (newPassword.length < 8) {
@@ -42,27 +42,93 @@ function SettingsPage() {
       return;
     }
 
-    toast.success("Password changed successfully!");
-    setNewPassword("");
-    setConfirmPassword("");
-    setShowPasswordForm(false);
+    try {
+      await user.updatePassword({ newPassword });
+      toast.success("Password changed successfully!");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordForm(false);
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error("Failed to change password");
+    }
   };
 
-  const handleUpdateProfile = () => {
-    toast.success("Profile updated successfully!");
+  const handleProfilePictureChange = async () => {
+    try {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 10 * 1024 * 1024) {
+          toast.error("Image must be less than 10MB");
+          return;
+        }
+        
+        try {
+          await user.setProfileImage({ file });
+          toast.success("Profile picture updated successfully!");
+        } catch (error) {
+          console.error("Error updating profile picture:", error);
+          toast.error("Failed to update profile picture");
+        }
+      };
+      
+      input.click();
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to open file selector");
+    }
   };
 
-  const handleUpdateEmail = () => {
-    toast.success("Email updated successfully!");
+  const handleUpdateProfile = async () => {
+    try {
+      if (!name.trim()) {
+        toast.error("Name cannot be empty");
+        return;
+      }
+      await user.update({
+        firstName: name,
+      });
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
+    }
   };
 
-  const handleAddAlternateEmail = () => {
+  const handleUpdateEmail = async () => {
+    try {
+      if (!email.trim()) {
+        toast.error("Email cannot be empty");
+        return;
+      }
+      // Clerk requires email verification before update
+      await user.createEmailAddress({ email });
+      toast.success("Verification email sent! Check your inbox.");
+    } catch (error) {
+      console.error("Error updating email:", error);
+      toast.error("Failed to update email");
+    }
+  };
+
+  const handleAddAlternateEmail = async () => {
     if (!alternateEmail) {
       toast.error("Please enter an email address");
       return;
     }
-    toast.success("Alternate email added successfully!");
-    setAlternateEmail("");
+    try {
+      await user.createEmailAddress({ email: alternateEmail });
+      toast.success("Verification email sent to alternate address!");
+      setAlternateEmail("");
+    } catch (error) {
+      console.error("Error adding alternate email:", error);
+      toast.error("Failed to add alternate email");
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -93,7 +159,7 @@ function SettingsPage() {
           >
             Account Settings
             {activeTab === "account" && (
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-orange-500 rounded-t-full" />
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 rounded-t-full" />
             )}
           </button>
         </div>
@@ -104,9 +170,9 @@ function SettingsPage() {
           {activeTab === "account" && (
             <div className="space-y-8">
               {/* Profile Picture */}
-              <div className="card p-8">
+              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                  <CameraIcon className="size-6 text-orange-500" />
+                  <CameraIcon className="size-6 text-cyan-500" />
                   Profile Picture
                 </h3>
                 <div className="flex items-center gap-8">
@@ -117,16 +183,16 @@ function SettingsPage() {
                       className="relative size-24 rounded-full border-2 border-white shadow-lg object-cover"
                     />
                   </div>
-                  <button className="btn-primary">
+                  <button onClick={handleProfilePictureChange} className="btn-primary">
                     Change Picture
                   </button>
                 </div>
               </div>
 
               {/* Update Name */}
-              <div className="card p-8">
+              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                  <UserIcon className="size-6 text-orange-500" />
+                  <UserIcon className="size-6 text-cyan-500" />
                   Personal Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,9 +218,9 @@ function SettingsPage() {
               </div>
 
               {/* Email Settings */}
-              <div className="card p-8">
+              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                  <MailIcon className="size-6 text-orange-500" />
+                  <MailIcon className="size-6 text-cyan-500" />
                   Email Preferences
                 </h3>
                 <div className="space-y-6">
@@ -199,9 +265,9 @@ function SettingsPage() {
               </div>
 
               {/* Security */}
-              <div className="card p-8">
+              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                  <LockIcon className="size-6 text-orange-500" />
+                  <LockIcon className="size-6 text-cyan-500" />
                   Security
                 </h3>
                 

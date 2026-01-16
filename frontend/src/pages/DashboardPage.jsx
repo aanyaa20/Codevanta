@@ -77,14 +77,14 @@ function DashboardPage() {
   return (
     <DashboardLayout>
       {/* Hero / Banner Section */}
-      <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+      <div className="relative rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm border border-slate-200 shadow-lg">
         {/* Geometric Background */}
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-500 via-amber-200 to-transparent"></div>
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500 via-teal-200 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-1/3 h-full opacity-5 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-500 to-transparent"></div>
         
         <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-semibold mb-4 border border-orange-100">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 text-cyan-700 text-xs font-semibold mb-4 border border-cyan-100">
               <Rocket className="size-3" />
               <span>Ready for a new challenge?</span>
             </div>
@@ -107,7 +107,7 @@ function DashboardPage() {
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="btn-primary shadow-orange-500/20"
+                className="btn-primary shadow-cyan-500/20"
               >
                 <Plus className="size-4" />
                 Start Session
@@ -118,8 +118,8 @@ function DashboardPage() {
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card p-5 flex items-center gap-4 bg-white border-slate-200 hover:shadow-md transition-shadow">
-          <div className="size-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+        <div className="card p-5 flex items-center gap-4 bg-white/80 backdrop-blur-sm border-slate-200 hover:shadow-lg transition-shadow">
+          <div className="size-12 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-500">
             <Zap className="size-6" />
           </div>
           <div>
@@ -128,7 +128,7 @@ function DashboardPage() {
           </div>
         </div>
         
-        <div className="card p-5 flex items-center gap-4 bg-white border-slate-200 hover:shadow-md transition-shadow">
+        <div className="card p-5 flex items-center gap-4 bg-white/80 backdrop-blur-sm border-slate-200 hover:shadow-lg transition-shadow">
           <div className="size-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
             <Trophy className="size-6" />
           </div>
@@ -138,7 +138,7 @@ function DashboardPage() {
           </div>
         </div>
 
-        <div className="card p-5 flex items-center gap-4 bg-white border-slate-200 hover:shadow-md transition-shadow">
+        <div className="card p-5 flex items-center gap-4 bg-white/80 backdrop-blur-sm border-slate-200 hover:shadow-lg transition-shadow">
           <div className="size-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
             <Code2 className="size-6" />
           </div>
@@ -148,7 +148,7 @@ function DashboardPage() {
           </div>
         </div>
 
-        <div className="card p-5 flex items-center gap-4 bg-white border-slate-200 cursor-pointer hover:border-orange-300 transition-colors" onClick={() => setShowInviteModal(true)}>
+        <div className="card p-5 flex items-center gap-4 bg-white/80 backdrop-blur-sm cursor-pointer hover:border-cyan-300 transition-colors" onClick={() => setShowInviteModal(true)}>
            <div className="size-12 rounded-full bg-green-50 flex items-center justify-center text-green-500">
             <Users className="size-6" />
           </div>
@@ -168,7 +168,7 @@ function DashboardPage() {
              <h2 className="text-lg font-bold text-slate-900">Problems Solved</h2>
              <button 
                 onClick={() => navigate("/problems")}
-                className="text-sm text-orange-600 hover:text-orange-700 font-medium hover:underline"
+                className="text-sm text-cyan-600 hover:text-cyan-700 font-medium hover:underline"
               >
                 View All
               </button>
@@ -190,10 +190,10 @@ function DashboardPage() {
             </div>
           </div>
           
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm min-h-[400px]">
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-4 shadow-sm min-h-[400px]">
              {loadingActiveSessions ? (
                 <div className="flex items-center justify-center h-40">
-                  <div className="animate-spin size-6 border-2 border-orange-500 border-t-transparent rounded-full"></div>
+                  <div className="animate-spin size-6 border-2 border-cyan-500 border-t-transparent rounded-full"></div>
                 </div>
              ) : activeSessions.length > 0 ? (
                 <div className="space-y-3">

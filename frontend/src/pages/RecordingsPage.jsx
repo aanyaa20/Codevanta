@@ -129,7 +129,7 @@ function RecordingsPage() {
               placeholder="Search by problem name or difficulty..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
             />
           </div>
           
@@ -138,7 +138,7 @@ function RecordingsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white appearance-none cursor-pointer min-w-[180px]"
+              className="pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm appearance-none cursor-pointer min-w-[180px]"
             >
               <option value="most-recent">Most Recent</option>
               <option value="oldest">Oldest First</option>
@@ -150,7 +150,7 @@ function RecordingsPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2Icon className="size-12 animate-spin text-orange-500" />
+            <Loader2Icon className="size-12 animate-spin text-cyan-500" />
           </div>
         ) : error ? (
           <div className="card p-12 text-center">
@@ -178,7 +178,7 @@ function RecordingsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recordings.map((recording) => (
-              <div key={recording._id} className="card hover:shadow-xl transition-shadow">
+              <div key={recording._id} className="card hover:shadow-xl transition-shadow bg-white/80 backdrop-blur-sm">
                 {/* Thumbnail / Preview */}
                 <div className="relative h-48 bg-gradient-to-br from-slate-700 to-slate-900 rounded-t-xl overflow-hidden">
                   {recording.status === "ready" && recording.recordingUrl ? (
