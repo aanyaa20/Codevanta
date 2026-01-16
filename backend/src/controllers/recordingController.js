@@ -201,6 +201,12 @@ export async function refreshRecording(req, res) {
     // Fetch from Stream
     try {
       console.log("📡 Querying Stream API for callId:", recording.callId);
+      
+      if (!recording.callId) {
+        console.log("❌ No callId found on recording");
+        return res.status(400).json({ message: "Recording has no callId" });
+      }
+      
       const call = streamClient.video.call("default", recording.callId);
       
       // Use listRecordings() instead of queryRecordings()
@@ -248,10 +254,28 @@ export async function refreshRecording(req, res) {
       }
     } catch (streamError) {
       console.error("❌ Stream API error:", streamError.message);
-      console.error("   Full error:", streamError);
+      console.error("   Error name:", streamError.name);
+      console.error("   Error code:", streamError.code);
+      console.error("   Full error:", JSON.stringify(streamError, null, 2));
+      
+      // More specific error messages
+      if (streamError.message?.includes("not found") || streamError.code === 404) {
+        return res.status(404).json({ 
+          message: "Call not found on Stream. The recording may not have been started properly.",
+          details: streamError.message
+        });
+      }
+      
+      if (streamError.message?.includes("unauthorized") || streamError.code === 401) {
+        return res.status(500).json({ 
+          message: "Stream API authentication failed. Please contact support.",
+          details: "API credentials issue"
+        });
+      }
+      
       return res.status(500).json({ 
         message: "Recording is still being processed by Stream. Try again in a minute.",
-        error: streamError.message
+        details: streamError.message
       });
     }
 
