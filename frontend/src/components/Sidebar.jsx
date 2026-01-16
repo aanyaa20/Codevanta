@@ -5,9 +5,6 @@ import {
   Users,
   Clock,
   Settings,
-  Code2,
-  ChevronLeft,
-  ChevronRight,
   VideoIcon
 } from "lucide-react";
 import { UserButton, useUser, useClerk } from "@clerk/clerk-react";
@@ -31,13 +28,14 @@ function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <aside
-      className={`relative h-screen bg-white border-r border-[var(--border-subtle)]
-        transition-all duration-300 flex flex-col shadow-sm z-50
+      className={`relative h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900
+        border-r border-slate-700/50
+        transition-all duration-300 flex flex-col shadow-2xl z-50
         ${collapsed ? "w-20" : "w-[240px]"}`}
     >
       {/* ================= Brand Header ================= */}
       <div
-        className={`h-16 flex items-center border-b border-[var(--border-subtle)]
+        className={`h-16 flex items-center border-b border-slate-700/50
           ${collapsed ? "justify-center px-4" : "px-6"}`}
       >
         <button
@@ -47,13 +45,14 @@ function Sidebar({ collapsed, setCollapsed }) {
           }}
           className="flex items-center gap-3 group"
         >
-          <div className="size-8 rounded-lg bg-[var(--accent-primary)]
-            flex items-center justify-center shadow-md">
-            <Code2 className="size-5 text-white" />
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="CodeVanta Logo" 
+            className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_15px_rgba(6,182,212,0.7)] transition-all"
+          />
 
           {!collapsed && (
-            <span className="font-bold text-xl text-[var(--text-primary)]">
+            <span className="font-bold text-xl bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]">
               CodeVanta
             </span>
           )}
@@ -69,20 +68,21 @@ function Sidebar({ collapsed, setCollapsed }) {
               key={item.path}
               to={item.path}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg
-                transition-all duration-200 relative
+                transition-all duration-200 relative group
                 ${
                   active
-                    ? "bg-orange-50 text-[var(--accent-primary)] font-medium"
-                    : "text-[var(--text-secondary)] hover:bg-gray-100"
+                    ? "bg-gradient-to-r from-cyan-600/80 to-teal-600/80 text-white font-medium shadow-lg shadow-cyan-500/30"
+                    : "text-slate-400 hover:bg-slate-800/70 hover:text-white"
                 }`}
             >
-              <item.icon className="size-5 shrink-0" />
+              <item.icon className={`size-5 shrink-0 ${active ? 'drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'group-hover:text-cyan-400'}`} />
 
               {!collapsed && <span>{item.label}</span>}
 
-              {active && !collapsed && (
+              {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2
-                  w-1 h-8 bg-[var(--accent-primary)] rounded-r-full" />
+                  w-1 h-8 bg-gradient-to-b from-cyan-400 to-teal-400 rounded-r-full
+                  shadow-[0_0_10px_rgba(6,182,212,1)]" />
               )}
             </Link>
           );
@@ -90,7 +90,7 @@ function Sidebar({ collapsed, setCollapsed }) {
       </nav>
 
       {/* ================= User Section ================= */}
-      <div className="p-4 border-t border-[var(--border-subtle)]">
+      <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
         <div
           className={`flex items-center gap-3 ${
             collapsed ? "justify-center" : ""
@@ -100,17 +100,17 @@ function Sidebar({ collapsed, setCollapsed }) {
             appearance={{
               elements: {
                 avatarBox:
-                  "size-9 rounded-full ring-2 ring-white shadow-sm"
+                  "size-9 rounded-full ring-2 ring-cyan-500/50 shadow-lg shadow-cyan-500/30"
               }
             }}
           />
 
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">
+              <p className="text-sm font-semibold truncate text-slate-200">
                 {user?.firstName || "Developer"}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-slate-500 truncate">
                 {user?.primaryEmailAddress?.emailAddress}
               </p>
             </div>
@@ -122,15 +122,19 @@ function Sidebar({ collapsed, setCollapsed }) {
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute right-0 top-20 translate-x-1/2
-          size-8 rounded-full bg-[var(--accent-primary)]
+          size-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500
           text-white flex items-center justify-center
-          shadow-lg hover:scale-105 transition z-50"
+          shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/60 hover:scale-105 transition-all z-50"
         title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
       >
         {collapsed ? (
-          <ChevronRight size={16} />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         ) : (
-          <ChevronLeft size={16} />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         )}
       </button>
     </aside>

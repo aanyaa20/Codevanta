@@ -81,13 +81,13 @@ function ProblemsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card p-5 group transition-colors bg-white border-2 border-slate-200">
+        <div className="card p-5 group transition-colors bg-white/80 backdrop-blur-sm border-2 border-slate-200">
           <div className="text-sm text-slate-500 font-medium mb-1">Total Problems</div>
           <div className="text-3xl font-bold text-slate-900">{stats.total}</div>
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
             filter.difficulty === "Easy"
               ? "border-green-500 bg-green-50"
               : "border-transparent hover:border-green-500/30"
@@ -99,7 +99,7 @@ function ProblemsPage() {
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
             filter.difficulty === "Medium"
               ? "border-yellow-500 bg-yellow-50"
               : "border-transparent hover:border-yellow-500/30"
@@ -111,7 +111,7 @@ function ProblemsPage() {
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
             filter.difficulty === "Hard"
               ? "border-red-500 bg-red-50"
               : "border-transparent hover:border-red-500/30"
@@ -129,7 +129,7 @@ function ProblemsPage() {
           onClick={() => setFilter({ difficulty: "", tags: "" })}
           className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap shadow-sm ${
             !filter.difficulty && !filter.tags
-              ? "bg-slate-900 text-white"
+              ? "bg-cyan-500 text-white"
               : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
           }`}
         >
@@ -140,7 +140,7 @@ function ProblemsPage() {
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="size-8 animate-spin text-orange-500" />
+          <Loader2 className="size-8 animate-spin text-cyan-500" />
         </div>
       )}
 
@@ -160,18 +160,18 @@ function ProblemsPage() {
             <Link
               key={problem._id}
               to={`/problem/${problem.slug}`}
-              className="card p-6 block group border-l-4 border-l-transparent hover:border-l-orange-500 transition-all bg-white hover:shadow-md"
+              className="card p-6 block group border-l-4 border-l-transparent hover:border-l-cyan-500 transition-all bg-white/80 backdrop-blur-sm hover:shadow-lg"
             >
               <div className="flex items-start md:items-center gap-6">
                 {/* Icon */}
-                <div className="hidden md:flex size-12 rounded-xl bg-slate-50 border border-slate-100 items-center justify-center shrink-0 group-hover:bg-orange-50 transition-colors">
-                  <Code2 className="size-6 text-slate-400 group-hover:text-orange-500 transition-colors" />
+                <div className="hidden md:flex size-12 rounded-xl bg-slate-50 border border-slate-100 items-center justify-center shrink-0 group-hover:bg-cyan-50 transition-colors">
+                  <Code2 className="size-6 text-slate-400 group-hover:text-cyan-500 transition-colors" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-lg font-bold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+                    <h2 className="text-lg font-bold text-slate-900 group-hover:text-cyan-600 transition-colors truncate">
                       {problem.title}
                     </h2>
                     <span
