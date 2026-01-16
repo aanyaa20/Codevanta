@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { useUser, SignedIn, SignedOut, SignInButton, useClerk } from "@clerk/clerk-react";
+import { useUser, SignedIn, SignedOut, useClerk } from "@clerk/clerk-react";
 import { Plus, LogOut, HelpCircle, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import CreateSessionModal from "./CreateSessionModal";
@@ -49,7 +49,7 @@ function Navbar({ collapsed }) {
 
   return (
     <>
-    <header className="h-16 bg-white border-b border-[var(--border-subtle)] flex items-center justify-end px-6 md:px-8 shadow-sm z-40 relative">
+    <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-[var(--border-subtle)] flex items-center justify-end px-6 md:px-8 shadow-sm z-40 relative">
 
       <div className="flex items-center gap-4">
         {/* Only show Create New button on Live Sessions page */}
@@ -57,7 +57,7 @@ function Navbar({ collapsed }) {
           <>
             <button 
               onClick={() => setShowCreateModal(true)}
-              className="btn-primary rounded-full px-5 py-2 text-sm shadow-orange-500/20"
+              className="btn-primary rounded-full px-5 py-2 text-sm shadow-cyan-500/20"
             >
               <Plus className="size-4" />
               <span>Create New</span>

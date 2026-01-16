@@ -54,9 +54,9 @@ function HistoryPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card p-6 bg-white border-2 border-slate-200 hover:border-orange-300 transition-all">
+        <div className="card p-6 bg-white/80 backdrop-blur-sm border-2 border-slate-200 hover:border-cyan-300 transition-all shadow-lg">
           <div className="flex items-center gap-6 mb-4">
-            <div className="size-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+            <div className="size-16 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-500">
               <Code2 className="size-8" />
             </div>
             <div>
@@ -90,7 +90,7 @@ function HistoryPage() {
           </div>
         </div>
 
-        <div className="card p-6 flex items-center gap-6 group hover:border-green-200 transition-colors bg-white">
+        <div className="card p-6 flex items-center gap-6 group hover:border-green-200 transition-colors bg-white/80 backdrop-blur-sm shadow-lg">
           <div className="size-16 rounded-full bg-green-50 flex items-center justify-center text-green-500 group-hover:scale-105 transition-transform duration-300">
             <Trophy className="size-8" />
           </div>
@@ -109,7 +109,7 @@ function HistoryPage() {
           onClick={() => setActiveTab("all")}
           className={`px-2 py-2 font-semibold transition-colors ${
             activeTab === "all"
-              ? "text-orange-600 border-b-2 border-orange-500 -mb-1.5"
+              ? "text-cyan-600 border-b-2 border-cyan-500 -mb-1.5"
               : "text-slate-500 hover:text-slate-800"
           }`}
         >
@@ -119,7 +119,7 @@ function HistoryPage() {
           onClick={() => setActiveTab("completed")}
           className={`px-2 py-2 font-semibold transition-colors ${
             activeTab === "completed"
-              ? "text-orange-600 border-b-2 border-orange-500 -mb-1.5"
+              ? "text-cyan-600 border-b-2 border-cyan-500 -mb-1.5"
               : "text-slate-500 hover:text-slate-800"
           }`}
         >
@@ -129,7 +129,7 @@ function HistoryPage() {
           onClick={() => setActiveTab("in-progress")}
           className={`px-2 py-2 font-semibold transition-colors ${
             activeTab === "in-progress"
-              ? "text-orange-600 border-b-2 border-orange-500 -mb-1.5"
+              ? "text-cyan-600 border-b-2 border-cyan-500 -mb-1.5"
               : "text-slate-500 hover:text-slate-800"
           }`}
         >
@@ -140,13 +140,13 @@ function HistoryPage() {
       {/* Content */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader2 className="size-10 animate-spin text-orange-500" />
+          <Loader2 className="size-10 animate-spin text-cyan-500" />
           <p className="text-slate-400 animate-pulse">Loading history...</p>
         </div>
       ) : filteredSessions.length > 0 ? (
         <RecentSessions sessions={filteredSessions} isLoading={isLoading} />
       ) : (
-        <div className="card p-16 flex flex-col items-center justify-center text-center space-y-6 bg-white">
+        <div className="card p-16 flex flex-col items-center justify-center text-center space-y-6 bg-white/80 backdrop-blur-sm">
           <div className="size-24 rounded-full bg-slate-50 flex items-center justify-center">
             <Clock className="size-12 text-slate-300" />
           </div>
