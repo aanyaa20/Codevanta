@@ -1,0 +1,45 @@
+/* Collaborative editing cursor styles */
+.yRemoteSelection {
+  opacity: 0.4;
+}
+
+.yRemoteSelectionHead {
+  position: absolute;
+  border-left: 2px solid;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.yRemoteSelectionHead::after {
+  position: absolute;
+  content: ' ';
+  border: 3px solid;
+  border-radius: 3px;
+  left: -5px;
+  top: -5px;
+}
+
+/* User cursor label */
+.remote-cursor-label {
+  position: absolute;
+  top: -20px;
+  left: -2px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide remote cursors when user has disabled live editing */
+.hide-remote-cursors .yRemoteSelection,
+.hide-remote-cursors .yRemoteSelectionHead {
+  display: none !important;
+}
+

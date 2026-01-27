@@ -32,6 +32,7 @@ function SessionPage() {
   const [recordingId, setRecordingId] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [allowRemoteEditing, setAllowRemoteEditing] = useState(true);
 
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
 
@@ -62,6 +63,24 @@ function SessionPage() {
       setLoadingSubmissions(false);
     }
   };
+
+  // Fetch user preferences on mount
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const response = await axiosInstance.get("/users/preferences");
+        setAllowRemoteEditing(response.data.preferences.allowRemoteEditing ?? true);
+      } catch (error) {
+        console.error("Error fetching preferences:", error);
+        // Default to true if error
+        setAllowRemoteEditing(true);
+      }
+    };
+
+    if (user) {
+      fetchPreferences();
+    }
+  }, [user]);
 
   // Fetch problem data from API when session loads
   useEffect(() => {
@@ -273,6 +292,33 @@ function SessionPage() {
     }
   };
 
+  const handleToggleRemoteEditing = async () => {
+    const newValue = !allowRemoteEditing;
+    
+    // Optimistically update the UI immediately
+    setAllowRemoteEditing(newValue);
+    
+    // Show immediate feedback
+    toast.success(
+      newValue 
+        ? "🟢 Live mode - You can see others' changes" 
+        : "🔴 Solo mode - Working independently",
+      { duration: 2000 }
+    );
+    
+    // Update in background
+    try {
+      await axiosInstance.put("/users/preferences", {
+        allowRemoteEditing: newValue,
+      });
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      // Revert on error
+      setAllowRemoteEditing(!newValue);
+      toast.error("Failed to update preference");
+    }
+  };
+
   if (loadingSession) {
     return (
         <div className="h-screen flex items-center justify-center bg-slate-50 text-slate-900">
@@ -383,6 +429,11 @@ function SessionPage() {
                       onCodeChange={(value) => setCode(value)}
                       onRunCode={handleRunCode}
                       onSubmitCode={handleSubmit}
+                      sessionId={id}
+                      userId={user?.id}
+                      userName={user?.fullName || user?.firstName || "Anonymous"}
+                      allowRemoteEditing={allowRemoteEditing}
+                      onToggleRemoteEditing={handleToggleRemoteEditing}
                     />
                   </Panel>
 
