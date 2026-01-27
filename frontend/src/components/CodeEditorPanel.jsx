@@ -1,5 +1,6 @@
 import Editor from "@monaco-editor/react";
-import { Loader2Icon, PlayIcon, SendIcon } from "lucide-react";
+import CollaborativeEditor from "./CollaborativeEditor";
+import { Loader2Icon, PlayIcon, SendIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 
 const LANGUAGE_CONFIG = {
   javascript: { name: "JavaScript", monacoLang: "javascript" },
@@ -18,6 +19,11 @@ function CodeEditorPanel({
   onCodeChange,
   onRunCode,
   onSubmitCode,
+  sessionId,
+  userId,
+  userName,
+  allowRemoteEditing,
+  onToggleRemoteEditing,
 }) {
   return (
     <div className="h-full flex flex-col bg-white relative group">
@@ -41,6 +47,29 @@ function CodeEditorPanel({
         </div>
 
         <div className="flex gap-2">
+          {/* Toggle Remote Editing Button */}
+          <button
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
+              allowRemoteEditing
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-slate-300 text-slate-700 hover:bg-slate-400"
+            }`}
+            onClick={onToggleRemoteEditing}
+            title={allowRemoteEditing ? "Live Editing Enabled" : "Live Editing Disabled"}
+          >
+            {allowRemoteEditing ? (
+              <>
+                <EyeIcon className="size-3" />
+                Live
+              </>
+            ) : (
+              <>
+                <EyeOffIcon className="size-3" />
+                Solo
+              </>
+            )}
+          </button>
+
           <button
             className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-600 text-white hover:bg-slate-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isRunning || isSubmitting}
@@ -80,11 +109,15 @@ function CodeEditorPanel({
       </div>
 
       <div className="flex-1 overflow-hidden relative border-b border-slate-200">
-        <Editor
+        <CollaborativeEditor
           height={"100%"}
           language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}
           value={code}
           onChange={onCodeChange}
+          sessionId={sessionId}
+          userId={userId}
+          userName={userName}
+          allowRemoteEditing={allowRemoteEditing}
           theme="light"
           options={{
             fontSize: 14,

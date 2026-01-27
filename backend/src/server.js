@@ -7,11 +7,13 @@ import { clerkMiddleware } from "@clerk/express";
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 import { inngest, functions } from "./lib/inngest.js";
+import { startYjsServer } from "./lib/yjs-server.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 import problemRoutes from "./routes/problemRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
 import recordingRoutes from "./routes/recordingRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
@@ -29,6 +31,7 @@ app.use("/api/sessions", sessionRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/recordings", recordingRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
@@ -46,7 +49,10 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
+    const httpServer = app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
+    
+    // Start Y.js WebSocket server integrated with Express
+    startYjsServer(httpServer);
   } catch (error) {
     console.error(" Error starting the server", error);
   }

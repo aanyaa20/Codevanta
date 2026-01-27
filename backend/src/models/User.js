@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    preferences: {
+      allowRemoteEditing: {
+        type: Boolean,
+        default: true, // By default, allow remote editing
+      },
+    },
   },
   { timestamps: true } // createdAt, updatedAt
 );

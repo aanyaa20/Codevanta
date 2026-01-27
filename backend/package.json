@@ -26,8 +26,13 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "inngest": "^3.44.3",
+    "lib0": "^0.2.117",
     "mongoose": "^8.19.1",
-    "stream-chat": "^9.24.0"
+    "stream-chat": "^9.24.0",
+    "ws": "^8.19.0",
+    "y-protocols": "^1.0.7",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.29"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
