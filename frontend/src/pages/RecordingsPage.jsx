@@ -2,10 +2,11 @@ import { useUser } from "@clerk/clerk-react";
 import { ClockIcon, PlayCircleIcon, Loader2Icon, VideoIcon, CalendarIcon, UserIcon, RefreshCwIcon, Trash2Icon, Search, Filter } from "lucide-react";
 import { useRecordings } from "../hooks/useRecordings";
 import DashboardLayout from "../components/DashboardLayout";
-import PageHeader from "../components/PageHeader";
+import PageTitleHeader from "../components/PageTitleHeader";
 import { useState, useMemo } from "react";
 import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 const DIFFICULTY_COLORS = {
   easy: "text-green-600 bg-green-50 border-green-200",
@@ -20,6 +21,11 @@ function RecordingsPage() {
   const [deletingId, setDeletingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("most-recent");
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    recordingId: null,
+    problemTitle: "",
+  });
 
   // Backend returns { recordings: [...] }
   const allRecordings = data?.recordings || [];
@@ -80,10 +86,17 @@ function RecordingsPage() {
     }
   };
 
-  const handleDelete = async (recordingId, problemTitle) => {
-    if (!window.confirm(`Delete recording for "${problemTitle}"?`)) {
-      return;
-    }
+  const handleDeleteClick = (recordingId, problemTitle) => {
+    setConfirmState({
+      open: true,
+      recordingId,
+      problemTitle,
+    });
+  };
+
+  const handleDelete = async () => {
+    const { recordingId, problemTitle } = confirmState;
+    setConfirmState({ open: false, recordingId: null, problemTitle: "" });
 
     setDeletingId(recordingId);
     try {
@@ -117,38 +130,40 @@ function RecordingsPage() {
 
   return (
     <DashboardLayout>
-      <PageHeader title="Recorded Sessions" subtitle="Watch your past coding sessions" />
-
-      <div className="p-6 max-w-7xl mx-auto">
-        {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by problem name or difficulty..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
-            />
+      <PageTitleHeader 
+        title="Recorded Sessions" 
+        subtitle="Watch your past coding sessions" 
+        rightSlot={
+          <div className="flex gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm min-w-[200px]"
+              />
+            </div>
+            
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm appearance-none cursor-pointer min-w-[180px]"
+              >
+                <option value="most-recent">Most Recent</option>
+                <option value="oldest">Oldest First</option>
+                <option value="longest">Longest Duration</option>
+                <option value="shortest">Shortest Duration</option>
+              </select>
+            </div>
           </div>
-          
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white/80 backdrop-blur-sm appearance-none cursor-pointer min-w-[180px]"
-            >
-              <option value="most-recent">Most Recent</option>
-              <option value="oldest">Oldest First</option>
-              <option value="longest">Longest Duration</option>
-              <option value="shortest">Shortest Duration</option>
-            </select>
-          </div>
-        </div>
+        }
+      />
 
-        {isLoading ? (
+      {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2Icon className="size-12 animate-spin text-cyan-500" />
           </div>
@@ -289,7 +304,7 @@ function RecordingsPage() {
                     
                     {/* Delete Button */}
                     <button
-                      onClick={() => handleDelete(recording._id, recording.problemTitle)}
+                      onClick={() => handleDeleteClick(recording._id, recording.problemTitle)}
                       disabled={deletingId === recording._id}
                       className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
                       title="Delete recording"
@@ -306,7 +321,18 @@ function RecordingsPage() {
             ))}
           </div>
         )}
-      </div>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        open={confirmState.open}
+        title="Delete Recording?"
+        description={`Are you sure you want to delete the recording for "${confirmState.problemTitle}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmState({ open: false, recordingId: null, problemTitle: "" })}
+      />
     </DashboardLayout>
   );
 }

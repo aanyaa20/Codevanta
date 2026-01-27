@@ -87,10 +87,10 @@ function ProblemsPage() {
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors cursor-pointer border-2 ${
             filter.difficulty === "Easy"
               ? "border-green-500 bg-green-50"
-              : "border-transparent hover:border-green-500/30"
+              : "border-transparent hover:border-green-500/30 bg-white"
           }`}
           onClick={() => handleDifficultyFilter("Easy")}
         >
@@ -99,10 +99,10 @@ function ProblemsPage() {
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors cursor-pointer border-2 ${
             filter.difficulty === "Medium"
               ? "border-yellow-500 bg-yellow-50"
-              : "border-transparent hover:border-yellow-500/30"
+              : "border-transparent hover:border-yellow-500/30 bg-white"
           }`}
           onClick={() => handleDifficultyFilter("Medium")}
         >
@@ -111,10 +111,10 @@ function ProblemsPage() {
         </div>
 
         <div
-          className={`card p-5 group transition-colors bg-white/80 backdrop-blur-sm cursor-pointer border-2 ${
+          className={`card p-5 group transition-colors cursor-pointer border-2 ${
             filter.difficulty === "Hard"
               ? "border-red-500 bg-red-50"
-              : "border-transparent hover:border-red-500/30"
+              : "border-transparent hover:border-red-500/30 bg-white"
           }`}
           onClick={() => handleDifficultyFilter("Hard")}
         >

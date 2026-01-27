@@ -1,4 +1,4 @@
-import { Code2, Clock, Calendar, CheckCircle2, Trophy, ArrowRight } from "lucide-react";
+import { Code2, Clock, Calendar, CheckCircle2, Trophy, ArrowRight, Zap } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router";
@@ -35,7 +35,7 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
         {sessions.slice(0, 5).map((session) => (
           <div
             key={session._id}
-            className="group flex items-center gap-3 p-3 rounded-lg bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50/10 transition-all cursor-pointer shadow-sm"
+            className="group flex items-center gap-3 p-3 rounded-lg bg-white border border-slate-200 hover:border-cyan-200 hover:bg-cyan-50/10 transition-all cursor-pointer shadow-sm"
             onClick={() => navigate(`/session/${session._id}`)}
           >
             <div className={`size-10 rounded-lg flex items-center justify-center shrink-0 ${
@@ -46,12 +46,12 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
               {session.status === "completed" ? (
                 <CheckCircle2 className="size-5" />
               ) : (
-                <Code2 className="size-5" />
+                <Zap className="size-5" />
               )}
             </div>
             
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm text-slate-900 truncate group-hover:text-orange-600 transition-colors">
+              <h4 className="font-medium text-sm text-slate-900 truncate group-hover:text-cyan-600 transition-colors">
                 {session.problem}
               </h4>
               <p className="text-xs text-slate-500 truncate">
@@ -72,7 +72,7 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
       {sessions.map((session) => (
         <div
           key={session._id}
-          className="card p-6 flex flex-col h-full group hover:shadow-md hover:border-orange-200 transition-all bg-white"
+          className="card p-6 flex flex-col h-full group hover:shadow-md hover:border-cyan-200 transition-all bg-white"
           onClick={() => navigate(`/session/${session._id}`)}
         >
           {/* Header */}
@@ -85,7 +85,7 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
               {session.status === "completed" ? (
                 <Trophy className="size-6" />
               ) : (
-                <Code2 className="size-6" />
+                <Zap className="size-6" />
               )}
             </div>
             <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border ${getDifficultyBadgeClass(session.difficulty)}`}>
@@ -95,7 +95,7 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
 
           {/* Content */}
           <div className="flex-1 mb-6">
-            <h3 className="font-bold text-lg mb-2 text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
+            <h3 className="font-bold text-lg mb-2 text-slate-900 group-hover:text-cyan-600 transition-colors line-clamp-1">
               {session.problem}
             </h3>
             <div className="flex flex-col gap-2 text-sm text-slate-500">
@@ -117,7 +117,7 @@ function RecentSessions({ sessions = [], isLoading, compact = false }) {
             }`}>
               {session.status}
             </span>
-            <button className="text-sm font-medium text-slate-400 group-hover:text-orange-600 transition-colors flex items-center gap-1">
+            <button className="text-sm font-medium text-slate-400 group-hover:text-cyan-600 transition-colors flex items-center gap-1">
               Details <ArrowRight className="size-3" />
             </button>
           </div>
