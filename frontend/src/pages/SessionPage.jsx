@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function SessionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [problemData, setProblemData] = useState(null);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [loadingProblem, setLoadingProblem] = useState(false);
   const [recordingId, setRecordingId] = useState(null);
   const [submissions, setSubmissions] = useState([]);
@@ -285,11 +287,14 @@ function SessionPage() {
     }
   };
 
+  const handleEndSessionClick = () => {
+    setShowEndConfirm(true);
+  };
+
   const handleEndSession = () => {
-    if (confirm("Are you sure you want to end this session? All participants will be notified.")) {
-      // this will navigate the HOST to dashboard
-      endSessionMutation.mutate(id, { onSuccess: () => navigate("/dashboard") });
-    }
+    setShowEndConfirm(false);
+    // this will navigate the HOST to dashboard
+    endSessionMutation.mutate(id, { onSuccess: () => navigate("/dashboard") });
   };
 
   const handleToggleRemoteEditing = async () => {
@@ -340,7 +345,7 @@ function SessionPage() {
           onBack={() => navigate("/dashboard")}
           isHost={isHost}
           onInvite={session?.status === "active" ? () => setShowInviteModal(true) : null}
-          onEndSession={session?.status === "active" ? handleEndSession : null}
+          onEndSession={session?.status === "active" ? handleEndSessionClick : null}
           isLoading={endSessionMutation.isPending}
         />
 
@@ -494,6 +499,19 @@ function SessionPage() {
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
         sessionId={id}
+        joinCode={session?.joinCode}
+      />
+
+      {/* End Session Confirm Modal */}
+      <ConfirmModal
+        open={showEndConfirm}
+        title="End Session?"
+        description="Are you sure you want to end this session? All participants will be notified."
+        confirmText="End Session"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleEndSession}
+        onCancel={() => setShowEndConfirm(false)}
       />
     </div>
   );

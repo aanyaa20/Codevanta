@@ -10,6 +10,7 @@ export const sessionApi = {
     const response = await axiosInstance.get("/sessions/active");
     return response.data;
   },
+  
   getMyRecentSessions: async () => {
     const response = await axiosInstance.get("/sessions/my-recent");
     return response.data;
@@ -24,10 +25,17 @@ export const sessionApi = {
     const response = await axiosInstance.post(`/sessions/${id}/join`);
     return response.data;
   },
+
+  joinByCode: async (joinCode) => {
+    const response = await axiosInstance.post("/sessions/join-by-code", { joinCode });
+    return response.data;
+  },
+  
   endSession: async (id) => {
     const response = await axiosInstance.post(`/sessions/${id}/end`);
     return response.data;
   },
+  
   getStreamToken: async () => {
     const response = await axiosInstance.get(`/chat/token`);
     return response.data;

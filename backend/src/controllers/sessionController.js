@@ -2,6 +2,16 @@
 import { chatClient, streamClient } from "../lib/stream.js";
 import Session from "../models/Session.js";
 
+// Generate a unique 6-character alphanumeric join code
+function generateJoinCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
 export async function createSession(req, res) {
   try {
     const { problem, difficulty } = req.body;
@@ -12,17 +22,45 @@ export async function createSession(req, res) {
       return res.status(400).json({ message: "Problem and difficulty are required" });
     }
 
+    // Ensure difficulty is lowercase
+    const normalizedDifficulty = difficulty.toLowerCase();
+
     // generate a unique call id for stream video
     const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // create session in db
-    const session = await Session.create({ problem, difficulty, host: userId, callId });
+    // generate unique join code (retry if collision)
+    let joinCode;
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (!isUnique && attempts < maxAttempts) {
+      joinCode = generateJoinCode();
+      const existingSession = await Session.findOne({ joinCode });
+      if (!existingSession) {
+        isUnique = true;
+      }
+      attempts++;
+    }
+
+    if (!isUnique) {
+      return res.status(500).json({ message: "Failed to generate unique join code. Please try again." });
+    }
+
+    // create session in db with join code
+    const session = await Session.create({ 
+      problem, 
+      difficulty: normalizedDifficulty, 
+      host: userId, 
+      callId,
+      joinCode 
+    });
 
     // create stream video call
     await streamClient.video.call("default", callId).getOrCreate({
       data: {
         created_by_id: clerkId,
-        custom: { problem, difficulty, sessionId: session._id.toString() },
+        custom: { problem, difficulty: normalizedDifficulty, sessionId: session._id.toString() },
       },
     });
 
@@ -35,7 +73,15 @@ export async function createSession(req, res) {
 
     await channel.create();
 
-    res.status(201).json({ session });
+    // Create join link
+    const joinLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/session/${session._id}`;
+
+    res.status(201).json({ 
+      session,
+      sessionId: session._id,
+      joinCode: session.joinCode,
+      joinLink 
+    });
   } catch (error) {
     console.log("Error in createSession controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -140,6 +186,64 @@ export async function joinSession(req, res) {
     res.status(200).json({ session });
   } catch (error) {
     console.log("Error in joinSession controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function joinByCode(req, res) {
+  try {
+    const { joinCode } = req.body;
+    const userId = req.user._id;
+    const clerkId = req.user.clerkId;
+
+    if (!joinCode) {
+      return res.status(400).json({ message: "Join code is required" });
+    }
+
+    // Find session by join code (case-insensitive)
+    const session = await Session.findOne({ 
+      joinCode: joinCode.toUpperCase(),
+      status: "active" 
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: "Invalid join code or session not found" });
+    }
+
+    if (session.host.toString() === userId.toString()) {
+      // Host can rejoin their own session
+      const joinLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/session/${session._id}`;
+      return res.status(200).json({ 
+        sessionId: session._id,
+        joinLink,
+        message: "You are the host of this session" 
+      });
+    }
+
+    // Check if session is full
+    if (session.participant && session.participant.toString() !== userId.toString()) {
+      return res.status(409).json({ message: "Session is full" });
+    }
+
+    // Add user as participant if not already
+    if (!session.participant) {
+      session.participant = userId;
+      await session.save();
+
+      // Add to chat channel
+      const channel = chatClient.channel("messaging", session.callId);
+      await channel.addMembers([clerkId]);
+    }
+
+    const joinLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/session/${session._id}`;
+    
+    res.status(200).json({ 
+      sessionId: session._id,
+      joinLink,
+      message: "Successfully joined session" 
+    });
+  } catch (error) {
+    console.log("Error in joinByCode controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }

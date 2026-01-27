@@ -1,20 +1,26 @@
 import { useNavigate } from "react-router";
 import { useActiveSessions } from "../hooks/useSessions";
 import { useUser } from "@clerk/clerk-react";
+import { useState } from "react";
 import { 
   Zap, 
   Loader2, 
   Sparkles,
   ArrowRight,
-  Plus
+  Plus,
+  KeyRound
 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import ActiveSessions from "../components/ActiveSessions";
+import LiveCreateSessionModal from "../components/LiveCreateSessionModal";
+import JoinSessionModal from "../components/JoinSessionModal";
 
 function LiveSessionsPage() {
   const navigate = useNavigate();
   const { user } = useUser();
   const { data: activeSessionsData, isLoading } = useActiveSessions();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const activeSessions = activeSessionsData?.sessions || [];
 
@@ -25,12 +31,35 @@ function LiveSessionsPage() {
 
   return (
     <DashboardLayout>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2 text-slate-900">Live Sessions</h1>
-        <p className="text-slate-500 text-lg">
-          Join active coding sessions and collaborate with other developers in real-time.
-        </p>
+      {/* Header with Action Buttons */}
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2 text-slate-900">Live Sessions</h1>
+            <p className="text-slate-500 text-lg">
+              Join active coding sessions and collaborate with other developers in real-time.
+            </p>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <button
+              onClick={() => setShowJoinModal(true)}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-300 transition-all shadow-sm flex items-center gap-2"
+            >
+              <KeyRound className="size-4" />
+              <span>Join Session</span>
+            </button>
+            
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 transition-all shadow-lg flex items-center gap-2"
+            >
+              <Plus className="size-4" />
+              <span>Create Session</span>
+            </button>
+          </div>
+        </div>
       </div>
 
        {/* Stats Card */}
@@ -90,6 +119,17 @@ function LiveSessionsPage() {
             </button>
           </div>
         )}
+
+      {/* Modals */}
+      <LiveCreateSessionModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
+      
+      <JoinSessionModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+      />
     </DashboardLayout>
   );
 }

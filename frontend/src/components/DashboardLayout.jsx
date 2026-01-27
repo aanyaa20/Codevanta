@@ -1,5 +1,5 @@
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import ProfileDropdown from "./ProfileDropdown";
 import { useState } from "react";
 
 function DashboardLayout({ children }) {
@@ -19,11 +19,13 @@ function DashboardLayout({ children }) {
       
       {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
-        <Navbar collapsed={collapsed} />
+        {/* Profile Dropdown - Top Right */}
+        <div className="absolute top-6 right-6 md:right-8 z-50">
+          <ProfileDropdown />
+        </div>
         
-        {/* Scrollable Content Area */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        {/* Scrollable Content Area with padding to avoid overlap */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 pt-20 pr-20 md:pr-24">
           <div className="max-w-7xl mx-auto space-y-8 pb-10">
             {children}
           </div>

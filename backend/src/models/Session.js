@@ -31,6 +31,14 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // 6-character join code
+    joinCode: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      length: 6,
+    },
   },
   { timestamps: true }
 );

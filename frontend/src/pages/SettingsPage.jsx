@@ -138,43 +138,42 @@ function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Settings
-          </h1>
-          <p className="text-slate-500">Manage your account preferences and profile details</p>
-        </div>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          Settings
+        </h1>
+        <p className="text-slate-500 text-lg">Manage your account preferences and profile details</p>
+      </div>
 
-        {/* Tabs Navigation */}
-        <div className="flex gap-2 mb-8 border-b border-slate-200">
-          <button
-            onClick={() => setActiveTab("account")}
-            className={`px-6 py-3 font-semibold transition-all relative ${
-              activeTab === "account"
-                ? "text-slate-900"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            Account Settings
-            {activeTab === "account" && (
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 rounded-t-full" />
-            )}
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Account Settings Tab */}
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 mb-6 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab("account")}
+          className={`px-6 py-3 font-semibold transition-all relative ${
+            activeTab === "account"
+              ? "text-slate-900"
+              : "text-slate-500 hover:text-slate-900"
+          }`}
+        >
+          Account Settings
           {activeTab === "account" && (
-            <div className="space-y-8">
-              {/* Profile Picture */}
-              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                  <CameraIcon className="size-6 text-cyan-500" />
-                  Profile Picture
-                </h3>
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 rounded-t-full" />
+          )}
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {/* Account Settings Tab */}
+        {activeTab === "account" && (
+          <div className="space-y-6">
+            {/* Profile Picture */}
+            <div className="card p-6 bg-white shadow-sm">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
+                <CameraIcon className="size-6 text-cyan-500" />
+                Profile Picture
+              </h3>
                 <div className="flex items-center gap-8">
                   <div className="relative group">
                     <img
@@ -190,7 +189,7 @@ function SettingsPage() {
               </div>
 
               {/* Update Name */}
-              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
+              <div className="card p-6 bg-white shadow-sm">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
                   <UserIcon className="size-6 text-cyan-500" />
                   Personal Information
@@ -218,7 +217,7 @@ function SettingsPage() {
               </div>
 
               {/* Email Settings */}
-              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
+              <div className="card p-6 bg-white shadow-sm">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
                   <MailIcon className="size-6 text-cyan-500" />
                   Email Preferences
@@ -265,7 +264,7 @@ function SettingsPage() {
               </div>
 
               {/* Security */}
-              <div className="card p-8 bg-white/80 backdrop-blur-sm shadow-lg">
+              <div className="card p-6 bg-white shadow-sm">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-3 text-slate-900">
                   <LockIcon className="size-6 text-cyan-500" />
                   Security
@@ -358,7 +357,7 @@ function SettingsPage() {
               </div>
 
               {/* Danger Zone */}
-              <div className="card p-8 border border-red-200 relative overflow-hidden">
+              <div className="card p-6 border border-red-200 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-5">
                     <AlertTriangleIcon className="size-32 text-red-500" />
                 </div>
@@ -397,7 +396,6 @@ function SettingsPage() {
             </div>
           )}
         </div>
-      </div>
     </DashboardLayout>
   );
 }

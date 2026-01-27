@@ -5,12 +5,27 @@ import {
   Users,
   Loader2,
   Clock,
-  Sparkles
+  Sparkles,
+  Copy,
+  CheckCircle
 } from "lucide-react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils";
+import { useState } from "react";
 
 function ActiveSessions({ sessions = [], isLoading, isUserInSession }) {
+  const [copiedCode, setCopiedCode] = useState(null);
+
+  const handleCopyCode = async (code, sessionId) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(sessionId);
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch (error) {
+      console.error("Failed to copy code:", error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="card p-12 flex flex-col items-center justify-center gap-4 min-h-[200px] bg-white border-slate-200">
@@ -90,6 +105,31 @@ function ActiveSessions({ sessions = [], isLoading, isUserInSession }) {
                     <Clock className="size-3" />
                     <span>Now</span>
                   </div>
+
+                  {session.joinCode && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-slate-300" />
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-cyan-50 border border-cyan-200">
+                        <span className="font-mono font-semibold text-cyan-700 text-[11px] tracking-wide">
+                          {session.joinCode}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleCopyCode(session.joinCode, session._id);
+                          }}
+                          className="p-0.5 rounded hover:bg-cyan-100 transition-colors"
+                          title="Copy join code"
+                        >
+                          {copiedCode === session._id ? (
+                            <CheckCircle className="size-3 text-green-600" />
+                          ) : (
+                            <Copy className="size-3 text-cyan-600" />
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
