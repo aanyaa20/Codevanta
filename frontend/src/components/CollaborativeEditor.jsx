@@ -20,6 +20,8 @@ const CollaborativeEditor = ({
   const bindingRef = useRef(null);
   const ydocRef = useRef(null);
   const yTextRef = useRef(null);
+  const isSyncedRef = useRef(false);
+  const lastValueRef = useRef(null);
   
   // Track mode state
   const isSoloModeRef = useRef(!allowRemoteEditing);
@@ -49,10 +51,6 @@ const CollaborativeEditor = ({
       const yText = ydoc.getText("monaco");
       yTextRef.current = yText;
 
-      // Set initial value if provided
-      if (value && yText.length === 0) {
-        yText.insert(0, value);
-      }
 
       // Connect to WebSocket server
       // Use environment variable for production, fallback to localhost for development
@@ -90,8 +88,7 @@ const CollaborativeEditor = ({
       const localText = localDoc.getText("monaco");
       localTextRef.current = localText;
 
-      // Initialize with current shared content
-      localText.insert(0, yText.toString() || value || "");
+      // Initialize local content after initial sync to avoid interleaving
 
       // ============================================
       // SETUP BINDINGS BASED ON MODE
@@ -124,19 +121,43 @@ const CollaborativeEditor = ({
 
       // Sync changes to parent component
       yText.observe(() => {
-        if (onChange && !isSoloModeRef.current) {
-          onChange(yText.toString());
-        }
+        if (!onChange || isSoloModeRef.current) return;
+        const nextValue = yText.toString();
+        if (lastValueRef.current === nextValue) return;
+        lastValueRef.current = nextValue;
+        onChange(nextValue);
       });
 
       localText.observe(() => {
-        if (onChange && isSoloModeRef.current) {
-          onChange(localText.toString());
-        }
+        if (!onChange || !isSoloModeRef.current) return;
+        const nextValue = localText.toString();
+        if (lastValueRef.current === nextValue) return;
+        lastValueRef.current = nextValue;
+        onChange(nextValue);
       });
 
       provider.on("status", (event) => {
         console.log("Y.js WebSocket status:", event.status);
+      });
+
+      provider.on("sync", (isSynced) => {
+        if (!isSynced || isSyncedRef.current) return;
+        isSyncedRef.current = true;
+
+        const sharedContent = yText.toString();
+        const initialContent = sharedContent || value || "";
+
+        if (!sharedContent && value) {
+          ydoc.transact(() => {
+            yText.insert(0, value);
+          }, "init");
+          lastValueRef.current = value;
+        }
+
+        if (localText.length === 0 && initialContent) {
+          localText.insert(0, initialContent);
+          lastValueRef.current = initialContent;
+        }
       });
 
       // Function to setup one-way sync from local to shared
@@ -302,11 +323,13 @@ const CollaborativeEditor = ({
 
   }, [allowRemoteEditing, sessionId, userId, userName]);
 
+  const editorValueProps = sessionId ? { defaultValue: value } : { value };
+
   return (
     <div className={!allowRemoteEditing ? "hide-remote-cursors" : ""} style={{ height: '100%' }}>
       <Editor
         language={language}
-        value={value}
+        {...editorValueProps}
         onMount={handleEditorDidMount}
         theme="vs-dark"
         options={{

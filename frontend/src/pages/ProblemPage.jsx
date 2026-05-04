@@ -348,14 +348,6 @@ function ProblemPage() {
                 {/* Test Cases & Output - Resizable */}
                 <Panel defaultSize={30} minSize={15} maxSize={60}>
                   <div className="h-full border-t border-slate-200 bg-slate-50 overflow-y-auto p-4">
-                    <h4 className="text-sm font-bold text-slate-900 mb-2">Output</h4>
-
-                    {!output && (
-                      <div className="text-sm text-slate-500">
-                        Code execution is currently disabled.
-                      </div>
-                    )}
-
                     {output && (
                       <div className="space-y-3">
                         {/* Status */}

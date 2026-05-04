@@ -19,8 +19,7 @@ function OutputPanel({ output, testResults, isRunning }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-        <h3 className="text-sm font-semibold text-slate-700">Output</h3>
+      <div className="flex items-center justify-end px-4 py-3 border-b border-slate-200 bg-slate-50">
         {isRunning && (
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <Loader2 className="size-4 animate-spin" />
@@ -118,11 +117,7 @@ function OutputPanel({ output, testResults, isRunning }) {
               <pre className="text-sm text-slate-700 font-mono bg-white p-3 rounded overflow-x-auto whitespace-pre-wrap">{simpleOutput}</pre>
             </div>
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-slate-400">
-            <p className="text-sm">Code execution is currently disabled.</p>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
