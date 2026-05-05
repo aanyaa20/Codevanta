@@ -87,8 +87,10 @@ function SessionPage() {
       
       try {
         setLoadingProblem(true);
-        // Try to find problem by title from all problems
-        const response = await axiosInstance.get("/problems");
+        // Fetch limited set of problems to find the one by title
+        const response = await axiosInstance.get("/problems", {
+          params: { limit: 50, page: 1 }
+        });
         const problems = response.data.problems || [];
         const problem = problems.find((p) => p.title === session.problem);
         

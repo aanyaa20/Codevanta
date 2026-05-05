@@ -1,5 +1,5 @@
 import { Code2, Loader2, Plus, X, Search, CheckCircle, Copy, Link as LinkIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import AlertModal from "./ui/AlertModal";
@@ -14,6 +14,7 @@ function LiveCreateSessionModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState(null);
   const createSessionMutation = useCreateSession();
+  const searchDebounceRef = useRef(null);
   
   const [alertState, setAlertState] = useState({
     open: false,
@@ -33,7 +34,10 @@ function LiveCreateSessionModal({ isOpen, onClose }) {
   const fetchProblems = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/problems");
+      // Fetch limited set of problems with pagination
+      const response = await axiosInstance.get("/problems", {
+        params: { limit: 30, page: 1 }
+      });
       const problems = response.data.problems || [];
       setAllProblems(problems);
       
@@ -51,6 +55,10 @@ function LiveCreateSessionModal({ isOpen, onClose }) {
   };
 
   useEffect(() => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
     if (searchQuery.trim() === "") {
       const randomCount = Math.min(6, allProblems.length);
       const randomProblems = allProblems
@@ -58,11 +66,20 @@ function LiveCreateSessionModal({ isOpen, onClose }) {
         .slice(0, randomCount);
       setDisplayedProblems(randomProblems);
     } else {
-      const filtered = allProblems.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setDisplayedProblems(filtered);
+      // Debounce search
+      searchDebounceRef.current = setTimeout(() => {
+        const filtered = allProblems.filter((p) =>
+          p.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setDisplayedProblems(filtered);
+      }, 200);
     }
+
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
   }, [searchQuery, allProblems]);
 
   const handleCreateSession = async () => {

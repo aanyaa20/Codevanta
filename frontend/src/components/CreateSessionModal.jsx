@@ -1,5 +1,5 @@
 import { Code2, Loader2, Plus, X, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../lib/axios";
 
 function CreateSessionModal({
@@ -14,22 +14,26 @@ function CreateSessionModal({
   const [displayedProblems, setDisplayedProblems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const searchDebounceRef = useRef(null);
 
-  // Fetch all problems and select random 5-6
+  // Fetch problems once the modal is opened
   useEffect(() => {
     if (isOpen) {
       fetchProblems();
     }
   }, [isOpen]);
 
-  const fetchProblems = async () => {
+  const fetchProblems = async (limit = 30) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/problems");
+      // Fetch limited set of problems with pagination
+      const response = await axiosInstance.get("/problems", {
+        params: { limit, page: 1 }
+      });
       const problems = response.data.problems || [];
       setAllProblems(problems);
       
-      // Select random 5-6 problems
+      // Select random 6 problems
       const randomCount = Math.min(6, problems.length);
       const randomProblems = problems
         .sort(() => Math.random() - 0.5)
@@ -43,8 +47,12 @@ function CreateSessionModal({
     }
   };
 
-  // Filter problems based on search query
+  // Debounced search
   useEffect(() => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
     if (searchQuery.trim() === "") {
       // Show random problems when no search
       const randomCount = Math.min(6, allProblems.length);
@@ -53,12 +61,20 @@ function CreateSessionModal({
         .slice(0, randomCount);
       setDisplayedProblems(randomProblems);
     } else {
-      // Search and show matching problems
-      const filtered = allProblems.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setDisplayedProblems(filtered);
+      // Debounce search to avoid excessive filtering
+      searchDebounceRef.current = setTimeout(() => {
+        const filtered = allProblems.filter((p) =>
+          p.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setDisplayedProblems(filtered);
+      }, 200);
     }
+
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
   }, [searchQuery, allProblems]);
 
   const problems = displayedProblems;

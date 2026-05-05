@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getProblems,
+  getProblemsStats,
   getProblemBySlug,
   runCode,
   submitCode,
@@ -12,6 +13,7 @@ import { protectRoute, optionalAuth } from "../middleware/protectRoute.js";
 const router = express.Router();
 
 // Public routes
+router.get("/stats", getProblemsStats); // Must be before /:slug to avoid conflict
 router.get("/", getProblems);
 router.get("/:slug", getProblemBySlug);
 

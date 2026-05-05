@@ -1,13 +1,14 @@
 import { Link } from "react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import { ChevronRight, Code2, Filter, Loader2 } from "lucide-react";
-import { getDifficultyBadgeClass } from "../lib/utils";
+import { Code2, Loader2 } from "lucide-react";
 import axiosInstance from "../lib/axios";
+import ProblemListItem from "../components/ProblemListItem";
 
 function ProblemsPage() {
   const [problems, setProblems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadingStats, setLoadingStats] = useState(true);
   const [filter, setFilter] = useState({ difficulty: "", tags: "" });
   const [stats, setStats] = useState({
     total: 0,
@@ -15,44 +16,92 @@ function ProblemsPage() {
     medium: 0,
     hard: 0,
   });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+  });
+  const [hasMore, setHasMore] = useState(false);
+  const filterDebounceRef = useRef(null);
 
-  // Fetch total stats once on mount (independent of filters)
+  // Fetch stats once on mount (independent of filters)
   useEffect(() => {
-    fetchTotalStats();
+    fetchStats();
   }, []);
 
-  // Fetch filtered problems when filter changes
+  // Fetch problems when filter changes (with debounce)
   useEffect(() => {
-    fetchProblems();
+    // Clear previous debounce
+    if (filterDebounceRef.current) {
+      clearTimeout(filterDebounceRef.current);
+    }
+
+    // Reset to page 1 when filter changes
+    setPagination((prev) => ({ ...prev, page: 1 }));
+
+    // Debounce filter changes by 300ms
+    filterDebounceRef.current = setTimeout(() => {
+      fetchProblems(1); // Reset to page 1
+    }, 300);
+
+    return () => {
+      if (filterDebounceRef.current) {
+        clearTimeout(filterDebounceRef.current);
+      }
+    };
   }, [filter]);
 
-  const fetchTotalStats = async () => {
+  const fetchStats = async () => {
     try {
-      // Fetch all problems without filters to get true totals
-      const response = await axiosInstance.get("/problems");
-      const allProblems = response.data.problems || [];
-
-      setStats({
-        total: allProblems.length,
-        easy: allProblems.filter((p) => p.difficulty === "Easy").length,
-        medium: allProblems.filter((p) => p.difficulty === "Medium").length,
-        hard: allProblems.filter((p) => p.difficulty === "Hard").length,
-      });
+      setLoadingStats(true);
+      const response = await axiosInstance.get("/problems/stats");
+      
+      if (response.data.success) {
+        const statsData = response.data.stats;
+        setStats({
+          total: statsData.total || 0,
+          easy: statsData.easy || 0,
+          medium: statsData.medium || 0,
+          hard: statsData.hard || 0,
+        });
+      }
     } catch (error) {
       console.error("Error fetching stats:", error);
+    } finally {
+      setLoadingStats(false);
     }
   };
 
-  const fetchProblems = async () => {
+  const fetchProblems = async (page = 1) => {
     try {
       setLoading(true);
-      const params = {};
+      const params = {
+        page,
+        limit: pagination.limit,
+      };
       if (filter.difficulty) params.difficulty = filter.difficulty;
       if (filter.tags) params.tags = filter.tags;
 
       const response = await axiosInstance.get("/problems", { params });
       const fetchedProblems = response.data.problems || [];
-      setProblems(fetchedProblems);
+      const paginationData = response.data.pagination || {};
+
+      if (page === 1) {
+        setProblems(fetchedProblems);
+      } else {
+        // Append problems when loading more
+        setProblems((prev) => [...prev, ...fetchedProblems]);
+      }
+
+      setPagination({
+        page: paginationData.page || page,
+        limit: paginationData.limit || pagination.limit,
+        total: paginationData.total || 0,
+        totalPages: paginationData.totalPages || 0,
+      });
+
+      setHasMore(paginationData.page < paginationData.totalPages);
     } catch (error) {
       console.error("Error fetching problems:", error);
     } finally {
@@ -65,6 +114,10 @@ function ProblemsPage() {
       ...prev,
       difficulty: prev.difficulty === difficulty ? "" : difficulty,
     }));
+  };
+
+  const handleLoadMore = () => {
+    fetchProblems(pagination.page + 1);
   };
 
   return (
@@ -80,7 +133,7 @@ function ProblemsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="card p-5 group transition-colors bg-white/80 backdrop-blur-sm border-2 border-slate-200">
           <div className="text-sm text-slate-500 font-medium mb-1">Total Problems</div>
           <div className="text-3xl font-bold text-slate-900">{stats.total}</div>
@@ -124,7 +177,7 @@ function ProblemsPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide mb-6">
         <button
           onClick={() => setFilter({ difficulty: "", tags: "" })}
           className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap shadow-sm ${
@@ -137,15 +190,15 @@ function ProblemsPage() {
         </button>
       </div>
 
-      {/* Loading State */}
-      {loading && (
+      {/* Loading State - Initial Load */}
+      {pagination.page === 1 && loading && (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="size-8 animate-spin text-cyan-500" />
         </div>
       )}
 
       {/* Empty State */}
-      {!loading && problems.length === 0 && (
+      {!loading && problems.length === 0 && pagination.page === 1 && (
         <div className="text-center py-12">
           <Code2 className="size-16 mx-auto text-slate-300 mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">No problems found</h3>
@@ -154,60 +207,38 @@ function ProblemsPage() {
       )}
 
       {/* Problems List */}
-      {!loading && problems.length > 0 && (
+      {problems.length > 0 && (
         <div className="space-y-3">
           {problems.map((problem) => (
-            <Link
-              key={problem._id}
-              to={`/problem/${problem.slug}`}
-              className="card p-6 block group border-l-4 border-l-transparent hover:border-l-cyan-500 transition-all bg-white/80 backdrop-blur-sm hover:shadow-lg"
-            >
-              <div className="flex items-start md:items-center gap-6">
-                {/* Icon */}
-                <div className="hidden md:flex size-12 rounded-xl bg-slate-50 border border-slate-100 items-center justify-center shrink-0 group-hover:bg-cyan-50 transition-colors">
-                  <Code2 className="size-6 text-slate-400 group-hover:text-cyan-500 transition-colors" />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-lg font-bold text-slate-900 group-hover:text-cyan-600 transition-colors truncate">
-                      {problem.title}
-                    </h2>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getDifficultyBadgeClass(
-                        problem.difficulty
-                      )}`}
-                    >
-                      {problem.difficulty}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-sm text-slate-500 mb-1">
-                    {problem.tags && problem.tags.length > 0 && (
-                      <>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-xs font-medium text-slate-600 border border-slate-200">
-                          {problem.tags.join(" • ")}
-                        </span>
-                        <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
-                      </>
-                    )}
-                    {problem.acceptanceRate > 0 && (
-                      <span className="text-slate-400">
-                        Acceptance: {problem.acceptanceRate.toFixed(1)}%
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Action */}
-                <div className="flex items-center gap-2 text-slate-400 group-hover:text-orange-500 transition-colors font-medium text-sm shrink-0">
-                  Solve
-                  <ChevronRight className="size-5" />
-                </div>
-              </div>
-            </Link>
+            <ProblemListItem key={problem._id} problem={problem} />
           ))}
+        </div>
+      )}
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex items-center justify-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            disabled={loading}
+            className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-300 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              `Load More (${problems.length}/${pagination.total})`
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Pagination Info */}
+      {problems.length > 0 && (
+        <div className="text-center text-sm text-slate-500 mt-6">
+          Showing {problems.length} of {pagination.total} problems
         </div>
       )}
     </DashboardLayout>

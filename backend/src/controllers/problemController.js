@@ -3,12 +3,57 @@ import Submission from "../models/Submission.js";
 import { executeWithWrapper } from "../lib/codeExecutor.js";
 
 /**
+ * GET /api/problems/stats
+ * Get statistics about problems (difficulty counts) - FAST, no pagination
+ */
+export const getProblemsStats = async (req, res) => {
+  try {
+    // Use aggregation for fast count queries
+    const stats = await Problem.aggregate([
+      {
+        $group: {
+          _id: "$difficulty",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const total = await Problem.countDocuments();
+
+    const statsMap = {
+      total,
+      easy: 0,
+      medium: 0,
+      hard: 0,
+    };
+
+    stats.forEach((stat) => {
+      const difficulty = stat._id.toLowerCase();
+      if (difficulty in statsMap) {
+        statsMap[difficulty] = stat.count;
+      }
+    });
+
+    res.json({
+      success: true,
+      stats: statsMap,
+    });
+  } catch (error) {
+    console.error("Error in getProblemsStats:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch problem statistics",
+    });
+  }
+};
+
+/**
  * GET /api/problems
- * Get list of all problems (metadata only)
+ * Get list of all problems (metadata only) - with pagination
  */
 export const getProblems = async (req, res) => {
   try {
-    const { difficulty, tags, page = 1, limit = 50 } = req.query;
+    const { difficulty, tags, page = 1, limit = 20 } = req.query;
 
     const filter = {};
 

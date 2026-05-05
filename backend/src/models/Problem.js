@@ -95,9 +95,13 @@ const problemSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for efficient queries
-problemSchema.index({ difficulty: 1 });
-problemSchema.index({ tags: 1 });
+// Indexes for efficient queries
+// Note: slug has unique: true which auto-creates an index
+problemSchema.index({ difficulty: 1 }); // For filtering by difficulty
+problemSchema.index({ tags: 1 }); // For filtering by tags
+problemSchema.index({ difficulty: 1, tags: 1 }); // Compound index for combined filtering
+problemSchema.index({ createdAt: -1 }); // For sorting by creation date (pagination)
+problemSchema.index({ difficulty: 1, createdAt: -1 }); // Compound for filtered pagination
 
 const Problem = mongoose.model("Problem", problemSchema);
 
